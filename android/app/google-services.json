@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "711569817412",
+    "project_id": "duit-aing-prod",
+    "storage_bucket": "duit-aing-prod.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:711569817412:android:e9ec7ccab26de08dbbe111",
+        "android_client_info": {
+          "package_name": "com.scry.duit_aing"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBeG10I7PTpnPTCxYiFqe0ubuRpNp8U5Vg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
