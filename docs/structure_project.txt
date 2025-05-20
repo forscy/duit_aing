@@ -1,0 +1,41 @@
+
+==================================================
+Files in lib:
+==================================================
+lib/
+    firebase_options.dart
+    main.dart
+    models/
+        app_user.dart
+        debt.dart
+        enums.dart
+        transaction.dart
+        wallet.dart
+    providers/
+        auth_providers.dart
+        firebase_providers.dart
+        pay_debt_provider.dart
+        summary_providers.dart
+        transfer_provider.dart
+        wallet_detail_providers.dart
+    routes/
+        app_router.dart
+    services/
+        auth_service.dart
+        wallet_service.dart
+    ui/
+        home_page.dart
+        summary_page.dart
+        wallet_detail_page.dart
+        widgets/
+            wallet_card.dart
+
+==================================================
+Files in docs:
+==================================================
+docs/
+    structure_project.txt
+    learning/
+        provider_riverpod.md
+    requirements/
+        user_story.md

@@ -13,7 +13,7 @@ android {
     // compileSdk = flutter.compileSdkVersion
     compileSdk = 34
     // ndkVersion = flutter.ndkVersion
-    ndkVersion = 34
+    ndkVersion = "25.1.8937393"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
