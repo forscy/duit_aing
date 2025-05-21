@@ -1,3 +1,6 @@
+# Env
+development di windows dengan terminalnya menggunakan powershell
+
 # Kesimpulan Analisis Project "Duit Aing"
 
 ## Deskripsi Umum

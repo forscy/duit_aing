@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 import '../models/transaction.dart';
-import '../models/wallet.dart';
 import '../models/enums.dart';
 import '../services/transaction_service.dart';
 import 'wallet_controller.dart';
@@ -30,16 +29,17 @@ class TransactionController extends GetxController {
         loadTransactionsForWallet(walletId);
       }
     });
-  }
-  
-  // Menyiapkan stream untuk mendengarkan perubahan pada transaksi
+  }    // Menyiapkan stream untuk mendengarkan perubahan pada transaksi
   void setupTransactionsStream(String walletId) {
     currentWalletId.value = walletId;
     
     // Mendengarkan stream dari transaction service
     _transactionService.getTransactionsStream(walletId).listen(
-      (List<Transaction> transactionsList) {
-        transactions.assignAll(transactionsList);
+      (dynamic transactionsList) {
+        if (transactionsList is List) {
+          final typedList = List<Transaction>.from(transactionsList);
+          transactions.assignAll(typedList);
+        }
       },
       onError: (e) {
         print('Error in transactions stream: $e');

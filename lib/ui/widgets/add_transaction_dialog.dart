@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import '../../models/enums.dart';
-import '../../models/wallet.dart';
 import '../../controllers/transaction_controller.dart';
 import '../../controllers/wallet_controller.dart';
 

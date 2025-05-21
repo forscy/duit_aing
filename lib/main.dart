@@ -23,7 +23,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Duit Aing',      theme: ThemeData(
+      title: 'Duit Aing',      
+      theme: ThemeData(
         primaryColor: Color(0xFF6C5CE7),
         colorScheme: ColorScheme.fromSeed(
           seedColor: Color(0xFF6C5CE7),
@@ -31,8 +32,9 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
         textTheme: GoogleFonts.poppinsTextTheme(),
-      ),      initialBinding: AppBindings(),
-      initialRoute: Routes.home,
+      ),      
+      initialBinding: AppBindings(),
+      initialRoute: Routes.root,
       getPages: AppRoutes.routes,
       defaultTransition: Transition.fade,
       debugShowCheckedModeBanner: false,

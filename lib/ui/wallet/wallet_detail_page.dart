@@ -13,9 +13,8 @@ import '../widgets/add_transaction_dialog.dart';
 class WalletDetailPage extends StatelessWidget {
   final String walletId;
   const WalletDetailPage({Key? key, required this.walletId}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
+  @override  Widget build(BuildContext context) {
+    // Get controllers
     final walletController = Get.find<WalletController>();
     final transactionController = Get.find<TransactionController>();
     
@@ -25,6 +24,7 @@ class WalletDetailPage extends StatelessWidget {
     // Set selected wallet in wallet controller
     walletController.selectedWalletId.value = walletId;
     
+    // Use the walletController to get the wallet by ID
     final wallet = walletController.getWalletById(walletId);
 
     if (wallet == null) {
@@ -198,7 +198,7 @@ class WalletDetailPage extends StatelessWidget {
                     _showInviteUserDialog(context, wallet.id);
                   },
                 ),
-              if (wallet.ownerId == Get.find<WalletController>()._walletService._auth.currentUser?.uid)
+              if (wallet.ownerId == Get.find<WalletController>().currentUser?.uid)
                 ListTile(
                   leading: Icon(Icons.delete, color: Colors.red),
                   title: Text('Hapus Dompet', style: TextStyle(color: Colors.red)),
@@ -292,7 +292,7 @@ class WalletDetailPage extends StatelessWidget {
                     onPressed: () {
                       Navigator.pop(context);
                       // Update wallet
-                      walletController._walletService.updateWallet(
+                      walletController.walletService.updateWallet(
                         walletId: wallet.id,
                         name: nameController.text,
                         visibility: visibilityType.value,
@@ -466,7 +466,7 @@ class WalletDetailPage extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              walletController._walletService.deleteWallet(walletId).then((_) {
+              walletController.walletService.deleteWallet(walletId).then((_) {
                 Get.back(); // Kembali ke halaman utama
                 Get.snackbar(
                   'Sukses',

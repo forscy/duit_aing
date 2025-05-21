@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import '../models/wallet.dart';
 import '../models/enums.dart';
 import '../services/wallet_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class WalletController extends GetxController {
   final WalletService _walletService = WalletService();
@@ -14,6 +15,12 @@ class WalletController extends GetxController {
   
   // Selected wallet ID - untuk operasi yang memerlukan dompet terpilih
   final Rx<String?> selectedWalletId = Rx<String?>(null);
+  
+  // Getter untuk Firebase auth user
+  User? get currentUser => FirebaseAuth.instance.currentUser;
+  
+  // Getter untuk WalletService
+  WalletService get walletService => _walletService;
   
   @override
   void onInit() {

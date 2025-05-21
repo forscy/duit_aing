@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:get/get.dart';
+import 'package:rxdart/rxdart.dart' as rxdart;
 import '../models/wallet.dart';
 import '../models/enums.dart';
 
@@ -38,10 +38,8 @@ class WalletService {
             final data = doc.data() as Map<String, dynamic>;
             data['id'] = doc.id;
             return Wallet.fromMap(data);
-          }).toList());
-
-    // Gabungkan kedua stream
-    return Rx.combineLatest2(
+          }).toList());    // Gabungkan kedua stream
+    return rxdart.Rx.combineLatest2(
       ownedWalletsQuery, 
       sharedWalletsQuery, 
       (List<Wallet> owned, List<Wallet> shared) {

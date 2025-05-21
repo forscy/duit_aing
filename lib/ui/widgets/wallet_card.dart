@@ -121,11 +121,10 @@ class WalletCard extends StatelessWidget {
     final colorIndex = wallet.name.hashCode % colors.length;
     return colors[colorIndex.abs()];
   }
-
   // Format angka menjadi format mata uang
   String _formatCurrency(double amount) {
     RegExp reg = RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
-    Function mathFunc = (Match match) => '${match[1]}.';
+    String Function(Match) mathFunc = (Match match) => '${match[1]}.';
     return amount.toString().replaceAllMapped(reg, mathFunc);
   }
 }

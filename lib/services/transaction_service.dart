@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../models/transaction.dart';
+import '../models/transaction.dart' as model;
 import '../models/enums.dart';
-import '../models/wallet.dart';
 import 'wallet_service.dart';
 
 class TransactionService {
@@ -12,30 +11,27 @@ class TransactionService {
 
   // Mendapatkan collection reference untuk transactions
   CollectionReference get _transactionsRef => _firestore.collection('transactions');
-
   // Mendapatkan stream transaksi untuk dompet tertentu
-  Stream<List<Transaction>> getTransactionsStream(String walletId) {
+  Stream<List<model.Transaction>> getTransactionsStream(String walletId) {
     return _transactionsRef
         .where('walletId', isEqualTo: walletId)
         .orderBy('timestamp', descending: true)
         .snapshots()
-        .map((snapshot) => 
-          snapshot.docs.map((doc) {
+        .map((snapshot) =>          snapshot.docs.map((doc) {
             final data = doc.data() as Map<String, dynamic>;
             data['id'] = doc.id;
-            return Transaction.fromMap(data);
+            return model.Transaction.fromMap(data);
           }).toList());
   }
-
   // Mendapatkan transaksi berdasarkan ID
-  Future<Transaction?> getTransactionById(String transactionId) async {
+  Future<model.Transaction?> getTransactionById(String transactionId) async {
     try {
       final docSnapshot = await _transactionsRef.doc(transactionId).get();
       
       if (docSnapshot.exists) {
         final data = docSnapshot.data() as Map<String, dynamic>;
         data['id'] = docSnapshot.id;
-        return Transaction.fromMap(data);
+        return model.Transaction.fromMap(data);
       }
       
       return null;
