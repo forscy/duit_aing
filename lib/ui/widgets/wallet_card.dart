@@ -1,6 +1,7 @@
 import 'package:duit_aing/models/enums.dart';
 import 'package:flutter/material.dart';
 import '../../models/wallet.dart';
+import '../../utils/currency_formatter.dart';
 
 class WalletCard extends StatelessWidget {
   final Wallet wallet;
@@ -120,11 +121,7 @@ class WalletCard extends StatelessWidget {
     // Gunakan hashCode untuk distribusi warna
     final colorIndex = wallet.name.hashCode % colors.length;
     return colors[colorIndex.abs()];
-  }
-  // Format angka menjadi format mata uang
-  String _formatCurrency(double amount) {
-    RegExp reg = RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
-    String Function(Match) mathFunc = (Match match) => '${match[1]}.';
-    return amount.toString().replaceAllMapped(reg, mathFunc);
+  }  String _formatCurrency(double amount) {
+    return CurrencyFormatter.format(amount);
   }
 }
