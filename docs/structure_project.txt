@@ -24,11 +24,12 @@ lib/
         auth_service.dart
         wallet_service.dart
     ui/
-        home_page.dart
-        summary_page.dart
-        wallet_detail_page.dart
+        home
+        summary
+        wallet
+        transaction
         widgets/
-            wallet_card.dart
+            wallet
 
 ==================================================
 Files in docs:
