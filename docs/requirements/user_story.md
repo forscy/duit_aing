@@ -4,7 +4,7 @@
 ### US-01 Membuat Dompet
 
 Sebagai pengguna, saya ingin membuat beberapa dompet dengan nama, saldo awal, dan opsi Private/Shared sehingga saya bisa mengelola saldo yang berbeda.
-**Acceptance:** pengguna mengisi form nama + saldo + tipe, dompet tampil di daftar, dompet shared menghasilkan link/QR.
+**Acceptance:** pengguna mengisi form nama + saldo + tipe, dompet tampil di daftar, dompet shared bisa menambahkan pengguna menggunakan email
 
 ### US-02 Mencatat Transaksi di Dompet
 
@@ -13,8 +13,8 @@ Sebagai pengguna, saya ingin mencatat pemasukan dan pengeluaran di setiap dompet
 
 ### US-03 Membagikan Akses Dompet
 
-Sebagai pemilik dompet, saya ingin membagikan akses via link, QR, atau email sehingga orang lain bisa ikut memakai dompet.
-**Acceptance:** dompet shared memiliki link, QR atau email, user lain bisa join, bisa lihat dan mencatat transaksi.
+Sebagai pemilik dompet, saya ingin membagikan akses via invite dengan menambahkan email.
+**Acceptance:** dompet shared user lain bisa join ketika sudah di invite dan menerima nya, bisa lihat dan mencatat transaksi.
 
 ### US-04 Mencatat Hutang/Piutang
 

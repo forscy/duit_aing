@@ -36,3 +36,15 @@ enum DebtKind {
   /// Uang yang orang lain hutang ke kita
   receivable
 }
+
+/// Enum untuk status undangan dompet
+enum InvitationStatus {
+  /// Undangan menunggu respons
+  pending,
+  
+  /// Undangan diterima
+  accepted,
+  
+  /// Undangan ditolak
+  rejected
+}
