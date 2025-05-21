@@ -21,7 +21,7 @@ class QuickActionsMenu extends StatelessWidget {
       {
         'icon': Icons.account_balance_wallet,
         'color': Colors.green,
-        'label': 'Withdraw',
+        'label': 'Receive',
         'onTap': () {},
       },
       {
