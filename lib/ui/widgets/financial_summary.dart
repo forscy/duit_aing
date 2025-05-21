@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import '../../controllers/wallet_controller.dart';
 
 class FinancialSummary extends StatelessWidget {
-  const FinancialSummary({Key? key}) : super(key: key);
+  const FinancialSummary({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class FinancialSummary extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha:  0.1),
             blurRadius: 10,
             offset: Offset(0, 4),
           ),
@@ -39,7 +39,7 @@ class FinancialSummary extends StatelessWidget {
                 'Total Saldo',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha:  0.8),
                 ),
               ),
             ],
@@ -56,7 +56,7 @@ class FinancialSummary extends StatelessWidget {
             ),
           ),
           SizedBox(height: 16),
-          Divider(color: Colors.white.withOpacity(0.2)),
+          Divider(color: Colors.white.withValues(alpha:  0.2)),
           SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -92,7 +92,7 @@ class FinancialSummary extends StatelessWidget {
       children: [
         Icon(
           icon,
-          color: Colors.white.withOpacity(0.8),
+          color: Colors.white.withValues(alpha:  0.8),
           size: 24,
         ),
         SizedBox(height: 4),
@@ -100,7 +100,7 @@ class FinancialSummary extends StatelessWidget {
           title,
           style: TextStyle(
             fontSize: 12,
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha:  0.7),
           ),
         ),
         SizedBox(height: 2),
@@ -118,7 +118,7 @@ class FinancialSummary extends StatelessWidget {
   // Format angka menjadi format mata uang
   String _formatCurrency(double amount) {
     RegExp reg = RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
-    String Function(Match) mathFunc = (Match match) => '${match[1]}.';
+    mathFunc(Match match) => '${match[1]}.';
     return amount.toString().replaceAllMapped(reg, mathFunc);
   }
 }

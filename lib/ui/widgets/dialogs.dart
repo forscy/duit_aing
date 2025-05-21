@@ -8,10 +8,10 @@ class AddOptionsBottomSheet extends StatelessWidget {
   final VoidCallback onAddTransaction;
 
   const AddOptionsBottomSheet({
-    Key? key,
+    super.key,
     required this.onAddWallet,
     required this.onAddTransaction,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +43,7 @@ class AddOptionsBottomSheet extends StatelessWidget {
 }
 
 class AddWalletDialog extends StatefulWidget {
-  const AddWalletDialog({Key? key}) : super(key: key);
+  const AddWalletDialog({super.key});
 
   @override
   State<AddWalletDialog> createState() => _AddWalletDialogState();
@@ -66,78 +66,140 @@ class _AddWalletDialogState extends State<AddWalletDialog> {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Add New Wallet',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: nameController,
-              decoration: InputDecoration(labelText: 'Wallet Name'),
-            ),
-            const SizedBox(height: 15),
-            TextField(
-              controller: balanceController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(labelText: 'Initial Balance'),
-            ),
-            const SizedBox(height: 15),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        padding: EdgeInsets.all(20),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.8),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text('Visibility:'),
+                Text(
+                  'Add New Wallet',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Wallet Name',
+                    hintText: 'Enter wallet name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  textCapitalization: TextCapitalization.words,
+                  textInputAction: TextInputAction.next,
+                ),
+                const SizedBox(height: 15),
+                TextFormField(
+                  controller: balanceController,
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  decoration: InputDecoration(
+                    labelText: 'Initial Balance',
+                    hintText: 'Enter initial balance',
+                    prefixText: 'Rp ',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  textInputAction: TextInputAction.done,
+                ),
+                const SizedBox(height: 15),
+                Text(
+                  'Visibility:',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Card(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  child: Column(
+                    children: [
+                      RadioListTile<WalletVisibility>(
+                        title: Text('Private'),
+                        subtitle: Text('Only you can access'),
+                        value: WalletVisibility.private,
+                        groupValue: visibility,
+                        onChanged: (value) => setState(() => visibility = value!),
+                      ),
+                      Divider(height: 1),
+                      RadioListTile<WalletVisibility>(
+                        title: Text('Shared'),
+                        subtitle: Text('Can be shared with others'),
+                        value: WalletVisibility.shared,
+                        groupValue: visibility,
+                        onChanged: (value) => setState(() => visibility = value!),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Radio<WalletVisibility>(
-                      value: WalletVisibility.private,
-                      groupValue: visibility,
-                      onChanged: (value) {
-                        setState(() => visibility = value!);
-                      },
+                    TextButton(
+                      onPressed: () => Get.back(),
+                      child: Text('Cancel'),
                     ),
-                    Text('Private'),
-                    Radio<WalletVisibility>(
-                      value: WalletVisibility.shared,
-                      groupValue: visibility,
-                      onChanged: (value) {
-                        setState(() => visibility = value!);
-                      },
+                    const SizedBox(width: 16),
+                    SizedBox(
+                      width: 100,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Validate input
+                          if (nameController.text.trim().isEmpty) {
+                            Get.snackbar(
+                              'Error',
+                              'Please enter a wallet name',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.red.withValues(alpha: 0.7),
+                              colorText: Colors.white,
+                            );
+                            return;
+                          }
+                          
+                          final balance = double.tryParse(balanceController.text.replaceAll(',', '.'));
+                          if (balance == null) {
+                            Get.snackbar(
+                              'Error',
+                              'Please enter a valid balance',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.red.withValues(alpha: 0.7),
+                              colorText: Colors.white,
+                            );
+                            return;
+                          }
+
+                          // Add wallet
+                          final controller = Get.find<WalletController>();
+                          controller.addWallet(
+                            nameController.text.trim(),
+                            balance,
+                            visibility,
+                          );
+                          Get.back();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text('Add'),
+                      ),
                     ),
-                    Text('Shared'),
                   ],
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  child: Text('Cancel'),
-                  onPressed: () => Get.back(),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  child: Text('Add'),
-                  onPressed: () {
-                    if (nameController.text.isNotEmpty && balanceController.text.isNotEmpty) {
-                      final controller = Get.find<WalletController>();
-                      controller.addWallet(
-                        nameController.text,
-                        double.tryParse(balanceController.text) ?? 0,
-                        visibility,
-                      );
-                      Get.back();
-                    }
-                  },
-                ),
-              ],
-            ),
-          ],
+          ),
         ),
       ),
     );

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
-import '../routes/app_routes.dart';
 import 'auth/login_page.dart';
 import 'home/home_page.dart';
 
 /// This widget handles the authentication state and decides which screen to show
 class AuthRoot extends StatelessWidget {
-  const AuthRoot({Key? key}) : super(key: key);
+  const AuthRoot({super.key});
 
   @override
   Widget build(BuildContext context) {

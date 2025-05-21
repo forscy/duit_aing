@@ -21,9 +21,9 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    print('Firebase initialized successfully');
+    debugPrint('Firebase initialized successfully');
   } catch (e) {
-    print('Failed to initialize Firebase: $e');
+    debugPrint('Failed to initialize Firebase: $e');
     // Masih lanjutkan aplikasi meskipun Firebase gagal, 
     // tapi usernya akan menemukan masalah saat mencoba login
   }

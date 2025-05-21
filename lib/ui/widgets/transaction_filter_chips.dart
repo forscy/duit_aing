@@ -4,7 +4,7 @@ import '../../models/enums.dart';
 import '../../controllers/transaction_controller.dart';
 
 class TransactionFilterChips extends StatelessWidget {
-  const TransactionFilterChips({Key? key}) : super(key: key);
+  const TransactionFilterChips({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class TransactionFilterChips extends StatelessWidget {
               label: 'Pemasukan',
               isSelected: transactionController.filterType.value == TransactionType.income,
               onSelected: (_) => transactionController.setFilter(TransactionType.income),
-              backgroundColor: Colors.green.withOpacity(0.1),
+              backgroundColor: Colors.green.withValues(alpha: 0.1),
               selectedColor: Colors.green,
             ),
             SizedBox(width: 8),
@@ -37,7 +37,7 @@ class TransactionFilterChips extends StatelessWidget {
               label: 'Pengeluaran',
               isSelected: transactionController.filterType.value == TransactionType.expense,
               onSelected: (_) => transactionController.setFilter(TransactionType.expense),
-              backgroundColor: Colors.red.withOpacity(0.1),
+              backgroundColor: Colors.red.withValues(alpha: 0.1),
               selectedColor: Colors.red,
             ),
             SizedBox(width: 8),
@@ -46,7 +46,7 @@ class TransactionFilterChips extends StatelessWidget {
               label: 'Transfer',
               isSelected: transactionController.filterType.value == TransactionType.transfer,
               onSelected: (_) => transactionController.setFilter(TransactionType.transfer),
-              backgroundColor: Colors.blue.withOpacity(0.1),
+              backgroundColor: Colors.blue.withValues(alpha: 0.1),
               selectedColor: Colors.blue,
             ),
           ],
@@ -67,7 +67,7 @@ class TransactionFilterChips extends StatelessWidget {
       label: Text(label),
       selected: isSelected,
       onSelected: onSelected,
-      backgroundColor: backgroundColor ?? Theme.of(context).primaryColor.withOpacity(0.1),
+      backgroundColor: backgroundColor ?? Theme.of(context).primaryColor.withValues(alpha: 0.1),
       selectedColor: selectedColor ?? Theme.of(context).primaryColor,
       checkmarkColor: Colors.white,
       labelStyle: TextStyle(

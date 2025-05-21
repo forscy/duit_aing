@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class QuickActionsMenu extends StatelessWidget {
-  const QuickActionsMenu({Key? key}) : super(key: key);
+  const QuickActionsMenu({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +65,7 @@ class QuickActionsMenu extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 25,
-            backgroundColor: color.withOpacity(0.2),
+            backgroundColor: color.withValues(alpha: 0.2),
             child: Icon(
               icon,
               color: color,

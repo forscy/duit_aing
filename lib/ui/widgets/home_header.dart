@@ -6,9 +6,9 @@ class HomeHeader extends StatelessWidget {
   final AuthController authController;
 
   const HomeHeader({
-    Key? key,
+    super.key,
     required this.authController,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +45,7 @@ class HomeHeader extends StatelessWidget {
             },
             child: CircleAvatar(
               radius: 24,
-              backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
+              backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.2),
               child: Icon(
                 Icons.person,
                 color: Theme.of(context).primaryColor,

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import '../models/transaction.dart' as model;
 import '../models/enums.dart';
 import 'wallet_service.dart';
@@ -36,7 +37,7 @@ class TransactionService {
       
       return null;
     } catch (e) {
-      print('Error getting transaction by ID: $e');
+      debugPrint('Error getting transaction by ID: $e');
       return null;
     }
   }
@@ -132,7 +133,7 @@ class TransactionService {
       
       return newTransactionRef.id;
     } catch (e) {
-      print('Error creating transaction: $e');
+      debugPrint('Error creating transaction: $e');
       rethrow;
     }
   }
@@ -200,7 +201,7 @@ class TransactionService {
       // 6. Commit batch update
       await batch.commit();
     } catch (e) {
-      print('Error deleting transaction: $e');
+      debugPrint('Error deleting transaction: $e');
       rethrow;
     }
   }

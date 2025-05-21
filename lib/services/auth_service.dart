@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:get/get.dart';
+import 'package:flutter/foundation.dart';
 import '../models/app_user.dart' as model;
 
 class AuthService {
@@ -29,7 +29,7 @@ class AuthService {
       
       return userCredential;
     } catch (e) {
-      print('Error registering user: $e');
+      debugPrint('Error registering user: $e');
       rethrow;
     }
   }
@@ -56,7 +56,7 @@ class AuthService {
         password: password,
       );
     } catch (e) {
-      print('Error signing in: $e');
+      debugPrint('Error signing in: $e');
       rethrow;
     }
   }
@@ -84,7 +84,7 @@ class AuthService {
       
       return null;
     } catch (e) {
-      print('Error getting user data: $e');
+      debugPrint('Error getting user data: $e');
       return null;
     }
   }
@@ -110,7 +110,7 @@ class AuthService {
         await _firestore.collection('users').doc(currentUser!.uid).update(updates);
       }
     } catch (e) {
-      print('Error updating profile: $e');
+      debugPrint('Error updating profile: $e');
       rethrow;
     }
   }

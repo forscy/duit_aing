@@ -4,7 +4,7 @@ import '../../controllers/auth_controller.dart';
 import '../../routes/app_routes.dart';
 
 class RegisterPage extends StatelessWidget {
-  RegisterPage({Key? key}) : super(key: key);
+  RegisterPage({super.key});
   
   final AuthController _authController = Get.find<AuthController>();
   final TextEditingController _nameController = TextEditingController();

@@ -4,7 +4,7 @@ import '../../controllers/wallet_controller.dart';
 import '../../models/enums.dart';
 
 class AddWalletButton extends StatelessWidget {
-  const AddWalletButton({Key? key}) : super(key: key);
+  const AddWalletButton({super.key});
 
   @override
   Widget build(BuildContext context) {

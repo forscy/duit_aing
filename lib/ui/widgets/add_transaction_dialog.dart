@@ -8,12 +8,12 @@ class AddTransactionDialog extends StatefulWidget {
   final String walletId;
 
   const AddTransactionDialog({
-    Key? key,
+    super.key,
     required this.walletId,
-  }) : super(key: key);
+  });
 
   @override
-  _AddTransactionDialogState createState() => _AddTransactionDialogState();
+  State<AddTransactionDialog> createState() => _AddTransactionDialogState();
 }
 
 class _AddTransactionDialogState extends State<AddTransactionDialog> {
@@ -74,7 +74,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                    color: Theme.of(context).primaryColor.withValues(alpha:  0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -278,10 +278,10 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? color : color.withOpacity(0.1),
+          color: isSelected ? color : color.withValues(alpha:  0.1),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? color : color.withOpacity(0.5),
+            color: isSelected ? color : color.withValues(alpha:  0.5),
             width: 1,
           ),
         ),

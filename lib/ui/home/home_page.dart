@@ -18,7 +18,7 @@ class HomePage extends StatelessWidget {
     final walletController = Get.find<WalletController>();
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(

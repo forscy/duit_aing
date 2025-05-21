@@ -1,4 +1,3 @@
-import 'package:get/get.dart';
 import 'enums.dart';
 
 /// Model untuk representasi hutang/piutang

@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/wallet_controller.dart';
-import '../../models/wallet.dart';
 import 'wallet_card.dart';
 
 class WalletList extends StatelessWidget {
   final WalletController controller;
 
   const WalletList({
-    Key? key,
+    super.key,
     required this.controller,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

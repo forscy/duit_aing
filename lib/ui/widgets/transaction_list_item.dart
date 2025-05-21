@@ -9,11 +9,11 @@ class TransactionListItem extends StatelessWidget {
   final Function()? onDelete;
 
   const TransactionListItem({
-    Key? key,
+    super.key,
     required this.transaction,
     this.onTap,
     this.onDelete,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +68,7 @@ class TransactionListItem extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: typeColor.withOpacity(0.1),
+                  color: typeColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -120,7 +120,7 @@ class TransactionListItem extends StatelessWidget {
               
               // Transaction amount
               Text(
-                '${prefix}${formatter.format(transaction.amount)}',
+                '$prefix${formatter.format(transaction.amount)}',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: typeColor,
@@ -149,10 +149,10 @@ class TransactionListItem extends StatelessWidget {
                               Navigator.pop(context);
                               onDelete!();
                             },
-                            child: Text('Hapus'),
                             style: TextButton.styleFrom(
                               foregroundColor: Colors.red,
                             ),
+                            child: Text('Hapus'),
                           ),
                         ],
                       ),

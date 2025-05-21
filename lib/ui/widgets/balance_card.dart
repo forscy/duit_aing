@@ -8,9 +8,9 @@ class BalanceCard extends StatelessWidget {
   final AuthController authController;
 
   const BalanceCard({
-    Key? key,
+    super.key,
     required this.authController,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +74,7 @@ class BalanceCard extends StatelessWidget {
           Text(
             'Available Balance',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha:  0.8),
               fontSize: 14,
             ),
           ),

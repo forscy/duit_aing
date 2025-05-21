@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import '../models/transaction.dart';
 import '../models/enums.dart';
@@ -42,7 +43,7 @@ class TransactionController extends GetxController {
         }
       },
       onError: (e) {
-        print('Error in transactions stream: $e');
+        debugPrint('Error in transactions stream: $e');
         Get.snackbar(
           'Error',
           'Terjadi kesalahan saat memuat daftar transaksi',

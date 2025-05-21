@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../utils/currency_formatter.dart';
 
 class RecentTransactionsList extends StatelessWidget {
-  const RecentTransactionsList({Key? key}) : super(key: key);
+  const RecentTransactionsList({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +36,7 @@ class RecentTransactionsList extends StatelessWidget {
         TransactionItem(
           icon: Icons.music_note,
           iconColor: Colors.green,
-          iconBgColor: Colors.green.withOpacity(0.2),
+          iconBgColor: Colors.green.withValues(alpha:  0.2),
           title: 'Spotify Subscription',
           date: '12:01 am - 21 Jun 2021',
           amount: '-Rp11.90',
@@ -46,7 +45,7 @@ class RecentTransactionsList extends StatelessWidget {
         TransactionItem(
           icon: Icons.shopping_bag,
           iconColor: Colors.blue,
-          iconBgColor: Colors.blue.withOpacity(0.2),
+          iconBgColor: Colors.blue.withValues(alpha:  0.2),
           title: 'Online Shopping',
           date: '08:23 pm - 20 Jun 2021',
           amount: '-Rp240.00',
@@ -55,7 +54,7 @@ class RecentTransactionsList extends StatelessWidget {
         TransactionItem(
           icon: Icons.attach_money,
           iconColor: Colors.purple,
-          iconBgColor: Colors.purple.withOpacity(0.2),
+          iconBgColor: Colors.purple.withValues(alpha:  0.2),
           title: 'Salary Payment',
           date: '10:00 am - 15 Jun 2021',
           amount: '+Rp1,200.00',
@@ -76,7 +75,7 @@ class TransactionItem extends StatelessWidget {
   final bool isExpense;
 
   const TransactionItem({
-    Key? key,
+    super.key,
     required this.icon,
     required this.iconColor,
     required this.iconBgColor,
@@ -84,7 +83,7 @@ class TransactionItem extends StatelessWidget {
     required this.date,
     required this.amount,
     required this.isExpense,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

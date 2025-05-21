@@ -12,7 +12,7 @@ import '../widgets/add_transaction_dialog.dart';
 
 class WalletDetailPage extends StatelessWidget {
   final String walletId;
-  const WalletDetailPage({Key? key, required this.walletId}) : super(key: key);
+  const WalletDetailPage({super.key, required this.walletId});
   @override  Widget build(BuildContext context) {
     // Get controllers
     final walletController = Get.find<WalletController>();
@@ -168,7 +168,6 @@ class WalletDetailPage extends StatelessWidget {
   }
   
   void _showWalletOptions(BuildContext context, Wallet wallet) {
-    final walletController = Get.find<WalletController>();
     
     showModalBottomSheet(
       context: context,

@@ -4,9 +4,9 @@ class EmptyTransactionState extends StatelessWidget {
   final Function()? onAddTransaction;
   
   const EmptyTransactionState({
-    Key? key,
+    super.key,
     this.onAddTransaction,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

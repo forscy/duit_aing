@@ -1,3 +1,4 @@
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import '../models/wallet.dart';
 import '../models/enums.dart';
@@ -37,7 +38,7 @@ class WalletController extends GetxController {
         wallets.assignAll(walletsList);
       },
       onError: (e) {
-        print('Error in wallets stream: $e');
+        debugPrint('Error in wallets stream: $e');
         Get.snackbar(
           'Error',
           'Terjadi kesalahan saat memuat daftar dompet',
@@ -54,7 +55,7 @@ class WalletController extends GetxController {
       // Tidak perlu implementasi karena sudah menggunakan stream
       // Ini hanya untuk memastikan isLoading diperbarui dan API tetap konsisten
     } catch (e) {
-      print('Error fetching wallets: $e');
+      debugPrint('Error fetching wallets: $e');
       Get.snackbar(
         'Error',
         'Gagal mengambil daftar dompet: ${e.toString()}',

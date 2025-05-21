@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/rendering.dart';
 import 'package:rxdart/rxdart.dart' as rxdart;
 import '../models/wallet.dart';
 import '../models/enums.dart';
@@ -71,7 +72,7 @@ class WalletService {
       
       return null;
     } catch (e) {
-      print('Error getting wallet by ID: $e');
+      debugPrint('Error getting wallet by ID: $e');
       return null;
     }
   }
@@ -101,7 +102,7 @@ class WalletService {
       final docRef = await _walletsRef.add(walletData);
       return docRef.id;
     } catch (e) {
-      print('Error creating wallet: $e');
+      debugPrint('Error creating wallet: $e');
       rethrow;
     }
   }
@@ -132,7 +133,7 @@ class WalletService {
         'invitations': updatedWallet.invitations.map((i) => i.toMap()).toList()
       });
     } catch (e) {
-      print('Error inviting user to wallet: $e');
+      debugPrint('Error inviting user to wallet: $e');
       rethrow;
     }
   }
@@ -173,7 +174,7 @@ class WalletService {
         'sharedWith': updatedWallet.sharedWith,
       });
     } catch (e) {
-      print('Error accepting wallet invitation: $e');
+      debugPrint('Error accepting wallet invitation: $e');
       rethrow;
     }
   }
@@ -201,7 +202,7 @@ class WalletService {
         'invitations': updatedWallet.invitations.map((i) => i.toMap()).toList(),
       });
     } catch (e) {
-      print('Error rejecting wallet invitation: $e');
+      debugPrint('Error rejecting wallet invitation: $e');
       rethrow;
     }
   }
@@ -242,7 +243,7 @@ class WalletService {
         await _walletsRef.doc(walletId).update(updates);
       }
     } catch (e) {
-      print('Error updating wallet: $e');
+      debugPrint('Error updating wallet: $e');
       rethrow;
     }
   }
@@ -268,7 +269,7 @@ class WalletService {
       // Hapus dompet dari Firestore
       await _walletsRef.doc(walletId).delete();
     } catch (e) {
-      print('Error deleting wallet: $e');
+      debugPrint('Error deleting wallet: $e');
       rethrow;
     }
   }

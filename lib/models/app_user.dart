@@ -1,5 +1,3 @@
-import 'package:get/get.dart';
-
 /// Model untuk data pengguna aplikasi
 class AppUser {
   /// Identifier unik untuk pengguna
