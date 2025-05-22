@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'enums.dart';
 
 /// Model untuk representasi transaksi keuangan
@@ -21,7 +23,7 @@ class Transaction {
   final String? destinationWalletId;
   
   /// Waktu terjadinya transaksi
-  final DateTime timestamp;
+  final Timestamp timestamp;
   
   /// Constructor untuk Transaction
   Transaction({
@@ -47,8 +49,8 @@ class Transaction {
       ),
       destinationWalletId: map['destinationWalletId'],
       timestamp: map['timestamp'] != null 
-                 ? (map['timestamp'] as Timestamp).toDate() 
-                 : DateTime.now(),
+                 ? (map['timestamp'] as Timestamp)
+                 : Timestamp.now(),
     );
   }
   
@@ -73,7 +75,7 @@ class Transaction {
     String? description,
     TransactionType? type,
     String? destinationWalletId,
-    DateTime? timestamp,
+    Timestamp? timestamp,
   }) {
     return Transaction(
       id: id ?? this.id,
@@ -88,13 +90,4 @@ class Transaction {
 }
 
 /// Shorthand dari Firestore Timestamp untuk model
-class Timestamp {
-  final int seconds;
-  final int nanoseconds;
-  
-  Timestamp(this.seconds, this.nanoseconds);
-  
-  DateTime toDate() {
-    return DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
-  }
-}
+ 

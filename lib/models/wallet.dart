@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'enums.dart';
 
 /// Model untuk representasi undangan dompet
@@ -9,7 +11,7 @@ class WalletInvitation {
   final InvitationStatus status;
   
   /// Waktu undangan dibuat
-  final DateTime createdAt;
+  final Timestamp createdAt;
   
   /// Constructor untuk WalletInvitation
   WalletInvitation({
@@ -27,8 +29,8 @@ class WalletInvitation {
         orElse: () => InvitationStatus.pending,
       ),
       createdAt: map['createdAt'] != null 
-                ? (map['createdAt'] as Timestamp).toDate() 
-                : DateTime.now(),
+                ? (map['createdAt'] as Timestamp)
+                : Timestamp.now(),
     );
   }
   
@@ -45,7 +47,7 @@ class WalletInvitation {
   WalletInvitation copyWith({
     String? email,
     InvitationStatus? status,
-    DateTime? createdAt,
+    Timestamp? createdAt,
   }) {
     return WalletInvitation(
       email: email ?? this.email,
@@ -79,7 +81,7 @@ class Wallet {
   final List<WalletInvitation> invitations;
   
   /// Waktu pembuatan dompet
-  final DateTime createdAt;
+  final Timestamp createdAt;
   
   /// Constructor untuk Wallet
   Wallet({
@@ -115,8 +117,8 @@ class Wallet {
       sharedWith: List<String>.from(map['sharedWith'] ?? []),
       invitations: invitationsList,
       createdAt: map['createdAt'] != null 
-                ? (map['createdAt'] as Timestamp).toDate() 
-                : DateTime.now(),
+                ? (map['createdAt'] as Timestamp)
+                : Timestamp.now(),
     );
   }
   
@@ -143,7 +145,7 @@ class Wallet {
     WalletVisibility? visibility,
     List<String>? sharedWith,
     List<WalletInvitation>? invitations,
-    DateTime? createdAt,
+    Timestamp? createdAt,
   }) {
     return Wallet(
       id: id ?? this.id,
@@ -169,7 +171,7 @@ class Wallet {
     final newInvitation = WalletInvitation(
       email: email,
       status: InvitationStatus.pending,
-      createdAt: DateTime.now(),
+      createdAt: Timestamp.now(),
     );
     
     // Tambahkan ke daftar undangan
@@ -205,13 +207,4 @@ class Wallet {
 }
 
 /// Shorthand dari Firestore Timestamp untuk model
-class Timestamp {
-  final int seconds;
-  final int nanoseconds;
-  
-  Timestamp(this.seconds, this.nanoseconds);
-  
-  DateTime toDate() {
-    return DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
-  }
-}
+ 

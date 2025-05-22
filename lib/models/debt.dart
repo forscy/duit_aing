@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'enums.dart';
 
 /// Model untuk representasi hutang/piutang
@@ -24,10 +26,10 @@ class Debt {
   final String description;
   
   /// Tanggal hutang dibuat
-  final DateTime createdAt;
+  final Timestamp createdAt;
   
   /// Tanggal pelunasan (jika sudah dibayar)
-  final DateTime? paidAt;
+  final Timestamp? paidAt;
   
   /// ID dompet yang digunakan untuk membayar hutang (jika sudah dibayar)
   final String? paymentWalletId;
@@ -63,10 +65,10 @@ class Debt {
       ),
       description: map['description'] ?? '',
       createdAt: map['createdAt'] != null 
-                 ? (map['createdAt'] as Timestamp).toDate() 
-                 : DateTime.now(),
+                ? (map['createdAt'] as Timestamp)
+                : Timestamp.now(),
       paidAt: map['paidAt'] != null 
-              ? (map['paidAt'] as Timestamp).toDate() 
+              ? (map['paidAt'] as Timestamp)
               : null,
       paymentWalletId: map['paymentWalletId'],
     );
@@ -97,8 +99,8 @@ class Debt {
     DebtKind? kind,
     DebtStatus? status,
     String? description,
-    DateTime? createdAt,
-    DateTime? paidAt,
+    Timestamp? createdAt,
+    Timestamp? paidAt,
     String? paymentWalletId,
   }) {
     return Debt(
@@ -117,13 +119,4 @@ class Debt {
 }
 
 /// Shorthand dari Firestore Timestamp untuk model
-class Timestamp {
-  final int seconds;
-  final int nanoseconds;
-  
-  Timestamp(this.seconds, this.nanoseconds);
-  
-  DateTime toDate() {
-    return DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
-  }
-}
+ 
