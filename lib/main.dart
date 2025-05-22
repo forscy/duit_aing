@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'firebase_options.dart';
-import 'controllers/bindings.dart';
 import 'routes/app_routes.dart';
 
 void main() async {
@@ -42,52 +40,9 @@ class MyApp extends StatelessWidget {
           seedColor: Color(0xFF6C5CE7),
           brightness: Brightness.light,
         ),
-
-        scaffoldBackgroundColor: Color(0xFFF8F9FA),
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.white,
-          foregroundColor: Color(0xFF6C5CE7),
-          elevation: 0,
-          centerTitle: true,
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFF6C5CE7),
-            foregroundColor: Colors.white,
-            elevation: 0,
-            minimumSize: Size(double.infinity, 50),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.grey.shade300),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.grey.shade300),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Color(0xFF6C5CE7)),
-          ),
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        ),
-        cardTheme: CardTheme(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          elevation: 2,
-        ),
         useMaterial3: true,
-        textTheme: GoogleFonts.poppinsTextTheme(),
       ),
-      initialBinding: AppBindings(),
       initialRoute: Routes.root,
-      getPages: AppRoutes.routes,
       defaultTransition: Transition.fade,
       debugShowCheckedModeBanner: false,
       // Menangani error di seluruh aplikasi
