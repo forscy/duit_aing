@@ -101,8 +101,8 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
     // Daftar wallet lain untuk transfer
     final otherWallets = walletsAsync.when(
       data: (wallets) => wallets.where((w) => w.id != widget.walletId).toList(),
-      loading: () => <Wallet>[],
-      error: (_, __) => <Wallet>[],
+      loading: () => <WalletModel>[],
+      error: (_, __) => <WalletModel>[],
     );
     
     return Scaffold(
@@ -149,7 +149,7 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
     );
   }
   
-  Widget _buildWalletInfo(Wallet wallet) {
+  Widget _buildWalletInfo(WalletModel wallet) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -287,7 +287,7 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
     );
   }
   
-  Widget _buildDestinationWalletSelector(List<Wallet> otherWallets) {
+  Widget _buildDestinationWalletSelector(List<WalletModel> otherWallets) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -405,7 +405,7 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
         }
         
         // Buat objek transaksi
-        final transaction = model.Transaction(
+        final transaction = model.TransactionModel(
           id: const Uuid().v4(),
           walletId: widget.walletId,
           amount: amount,

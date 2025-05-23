@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:duit_aing/models/enums.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/transaction.dart' as transaction_model;
+import 'package:uuid/uuid.dart';
+import '../models/transaction.dart';
 import '../models/wallet.dart';
 
 /// Provider untuk operasi transaksi
@@ -16,7 +17,7 @@ class TransactionNotifier extends StateNotifier<AsyncValue<void>> {
   TransactionNotifier() : super(const AsyncValue.data(null));
 
   /// Method untuk menambah transaksi
-  Future<void> addTransaction(transaction_model.Transaction transaction) async {
+  Future<void> addTransaction(TransactionModel transaction) async {
     state = const AsyncValue.loading();
     try {
       // Gunakan transaction Firestore untuk memastikan atomicity
@@ -29,7 +30,7 @@ class TransactionNotifier extends StateNotifier<AsyncValue<void>> {
         }
         
         // 2. Update wallet balance berdasarkan jenis transaksi
-        Wallet wallet = Wallet.fromMap({'id': walletDoc.id, ...walletDoc.data()!});
+        WalletModel wallet = WalletModel.fromMap({'id': walletDoc.id, ...walletDoc.data()!});
         double updatedBalance = wallet.balance;
         
         switch (transaction.type) {          case TransactionType.income:
@@ -58,14 +59,34 @@ class TransactionNotifier extends StateNotifier<AsyncValue<void>> {
             if (!destWalletDoc.exists) {
               throw Exception('Dompet tujuan tidak ditemukan');
             }
-            
-            // Update saldo dompet tujuan
-            final destWallet = Wallet.fromMap({'id': destWalletDoc.id, ...destWalletDoc.data()!});
+              // Update saldo dompet tujuan
+            final destWallet = WalletModel.fromMap({'id': destWalletDoc.id, ...destWalletDoc.data()!});
             final updatedDestBalance = destWallet.balance + transaction.amount;
             
             txn.update(_firestore.collection('wallets').doc(transaction.destinationWalletId), {
               'balance': updatedDestBalance,
             });
+            
+            // Juga simpan catatan transaksi di dompet tujuan sebagai income
+            final destTransactionId = const Uuid().v4();
+            final destTransaction = TransactionModel(
+              id: destTransactionId,
+              walletId: transaction.destinationWalletId!,
+              amount: transaction.amount,
+              description: "Transfer dari ${wallet.name}: ${transaction.description}",
+              type: TransactionType.income,
+              destinationWalletId: transaction.walletId, // Referensi balik ke wallet sumber
+              timestamp: transaction.timestamp,
+            );
+            
+            final destTransactionRef = _firestore
+                .collection('wallets')
+                .doc(transaction.destinationWalletId)
+                .collection('transactions')
+                .doc(destTransactionId);
+                
+            txn.set(destTransactionRef, destTransaction.toMap());
+            
             break;
         }
         
@@ -73,9 +94,13 @@ class TransactionNotifier extends StateNotifier<AsyncValue<void>> {
         txn.update(_firestore.collection('wallets').doc(transaction.walletId), {
           'balance': updatedBalance,
         });
+          // 4. Simpan transaksi sebagai subkoleksi di dalam wallet
+        final transactionRef = _firestore
+            .collection('wallets')
+            .doc(transaction.walletId)
+            .collection('transactions')
+            .doc(transaction.id);
         
-        // 4. Simpan transaksi
-        final transactionRef = _firestore.collection('transactions').doc(transaction.id);
         txn.set(transactionRef, transaction.toMap());
       });
       
@@ -87,15 +112,16 @@ class TransactionNotifier extends StateNotifier<AsyncValue<void>> {
   }
 
   /// Mendapatkan transaksi berdasarkan wallet ID
-  Stream<List<transaction_model.Transaction>> getTransactionsByWalletId(String walletId) {
+  Stream<List<TransactionModel>> getTransactionsByWalletId(String walletId) {
     return _firestore
+        .collection('wallets')
+        .doc(walletId)
         .collection('transactions')
-        .where('walletId', isEqualTo: walletId)
         .orderBy('timestamp', descending: true)
         .snapshots()
         .map((snapshot) {
           return snapshot.docs
-              .map((doc) => transaction_model.Transaction.fromMap({
+              .map((doc) => TransactionModel.fromMap({
                     'id': doc.id,
                     ...doc.data(),
                   }))
@@ -105,7 +131,7 @@ class TransactionNotifier extends StateNotifier<AsyncValue<void>> {
 }
 
 /// Provider untuk stream daftar transaksi berdasarkan wallet
-final walletTransactionsProvider = StreamProvider.family<List<transaction_model.Transaction>, String>((ref, walletId) {
+final walletTransactionsProvider = StreamProvider.family<List<TransactionModel>, String>((ref, walletId) {
   final transactionNotifier = ref.watch(transactionNotifierProvider.notifier);
   return transactionNotifier.getTransactionsByWalletId(walletId);
 });

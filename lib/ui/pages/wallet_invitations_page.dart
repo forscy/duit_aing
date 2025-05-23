@@ -30,7 +30,7 @@ class WalletInvitationsPage extends ConsumerWidget {
             itemCount: invitations.length,
             itemBuilder: (context, index) {
               final item = invitations[index];
-              final wallet = item['wallet'] as Wallet;
+              final wallet = item['wallet'] as WalletModel;
               final invitation = item['invitation'] as WalletInvitation;
 
               return Card(

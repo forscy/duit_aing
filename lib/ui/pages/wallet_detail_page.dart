@@ -36,9 +36,7 @@ class WalletDetailPage extends ConsumerWidget {
             return const Center(
               child: Text('Dompet tidak ditemukan'),
             );
-          }
-
-          return SingleChildScrollView(
+          }          return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,8 +49,6 @@ class WalletDetailPage extends ConsumerWidget {
                 const SizedBox(height: 24),
                 if (wallet.visibility == WalletVisibility.shared)
                   _buildSharedWithSection(context, wallet),
-                const SizedBox(height: 24),
-                _buildTransactionList(context, ref, walletId),
               ],
             ),
           );
@@ -72,7 +68,7 @@ class WalletDetailPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildWalletHeader(BuildContext context, Wallet wallet) {
+  Widget _buildWalletHeader(BuildContext context, WalletModel wallet) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -124,7 +120,7 @@ class WalletDetailPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildActions(BuildContext context, WidgetRef ref, Wallet wallet) {
+  Widget _buildActions(BuildContext context, WidgetRef ref, WalletModel wallet) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -145,7 +141,7 @@ class WalletDetailPage extends ConsumerWidget {
           children: [            _buildActionItem(
               context,
               Icons.add_circle,
-              'Top Up',
+              'Pemasukan',
               () {
                 // Navigate to add transaction page with income type pre-selected
                 context.push('/wallet/${wallet.id}/add-transaction?type=income');
@@ -154,7 +150,7 @@ class WalletDetailPage extends ConsumerWidget {
             _buildActionItem(
               context,
               Icons.remove_circle,
-              'Tarik',
+              'Pengeluaran',
               () {
                 // Navigate to add transaction page with expense type pre-selected
                 context.push('/wallet/${wallet.id}/add-transaction?type=expense');
@@ -232,7 +228,7 @@ class WalletDetailPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildSharedWithSection(BuildContext context, Wallet wallet) {
+  Widget _buildSharedWithSection(BuildContext context, WalletModel wallet) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -346,7 +342,7 @@ class WalletDetailPage extends ConsumerWidget {
   void _showEditWalletDialog(
     BuildContext context,
     WidgetRef ref,
-    Wallet wallet,
+    WalletModel wallet,
   ) {
     final nameController = TextEditingController(text: wallet.name);
 
@@ -438,7 +434,7 @@ class WalletDetailPage extends ConsumerWidget {
   void _showDeleteConfirmation(
     BuildContext context,
     WidgetRef ref,
-    Wallet wallet,
+    WalletModel wallet,
   ) {
     showDialog(
       context: context,
@@ -508,7 +504,7 @@ class WalletDetailPage extends ConsumerWidget {
   void _showInviteDialog(
     BuildContext context,
     WidgetRef ref,
-    Wallet wallet,
+    WalletModel wallet,
   ) {
     final emailController = TextEditingController();
 
@@ -686,7 +682,7 @@ class WalletDetailPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildTransactionItem(BuildContext context, model.Transaction transaction) {
+  Widget _buildTransactionItem(BuildContext context, model.TransactionModel transaction) {
     // Determine icon and color based on transaction type
     IconData icon;
     Color color;

@@ -19,11 +19,11 @@ class WalletService {
     // _pendingTransactions.clear();
     // etc.
   }/// Mendapatkan daftar dompet yang dimiliki atau dibagikan ke pengguna
-  Stream<List<Wallet>> getWallets() {
+  Stream<List<WalletModel>> getWallets() {
     // Using standard Stream transformation
     final user = _auth.currentUser;
     if (user == null) {
-      return Stream.value(<Wallet>[]);
+      return Stream.value(<WalletModel>[]);
     }
     
     return _firestore
@@ -32,7 +32,7 @@ class WalletService {
         .snapshots()
         .map((snapshot) {
           return snapshot.docs
-              .map((doc) => Wallet.fromMap({
+              .map((doc) => WalletModel.fromMap({
                     'id': doc.id,
                     ...doc.data(),
                   }))
@@ -40,16 +40,16 @@ class WalletService {
         });
   }
     /// Mendapatkan detail dompet berdasarkan ID
-  Future<Wallet?> getWalletById(String walletId) async {
+  Future<WalletModel?> getWalletById(String walletId) async {
     final doc = await _firestore.collection('wallets').doc(walletId).get();
     if (!doc.exists) {
       return null;
     }
-    return Wallet.fromMap({'id': doc.id, ...doc.data()!});
+    return WalletModel.fromMap({'id': doc.id, ...doc.data()!});
   }
   
   /// Mendapatkan stream data wallet untuk memantau perubahan secara reaktif
-  Stream<Wallet?> watchWalletById(String walletId) {
+  Stream<WalletModel?> watchWalletById(String walletId) {
     return _firestore
         .collection('wallets')
         .doc(walletId)
@@ -58,12 +58,12 @@ class WalletService {
           if (!doc.exists) {
             return null;
           }
-          return Wallet.fromMap({'id': doc.id, ...doc.data()!});
+          return WalletModel.fromMap({'id': doc.id, ...doc.data()!});
         });
   }
 
   /// Membuat dompet baru
-  Future<Wallet> createWallet(String name, WalletVisibility visibility) async {
+  Future<WalletModel> createWallet(String name, WalletVisibility visibility) async {
     final user = _auth.currentUser;
     if (user == null) {
       throw Exception('User tidak terautentikasi');
@@ -82,21 +82,43 @@ class WalletService {
     final docRef = await _firestore.collection('wallets').add(walletData);
     
     // Ambil ID dokumen yang baru dibuat dan tambahkan ke data
-    final newWallet = Wallet.fromMap({'id': docRef.id, ...walletData});
+    final newWallet = WalletModel.fromMap({'id': docRef.id, ...walletData});
     return newWallet;
   }
 
   /// Mengupdate informasi dompet
-  Future<void> updateWallet(Wallet wallet) async {
+  Future<void> updateWallet(WalletModel wallet) async {
     await _firestore
         .collection('wallets')
         .doc(wallet.id)
         .update(wallet.toMap());
-  }
-
-  /// Menghapus dompet
+  }  /// Menghapus dompet
   Future<void> deleteWallet(String walletId) async {
-    await _firestore.collection('wallets').doc(walletId).delete();
+    try {
+      // 1. Hapus transaksi transfer terkait dari dompet lain terlebih dahulu
+      await _deleteRelatedTransfers(walletId);
+      
+      // 2. Dapatkan referensi dompet
+      final walletRef = _firestore.collection('wallets').doc(walletId);
+      
+      // 3. Dapatkan semua transaksi dari dompet
+      final transactionsSnapshot = await walletRef.collection('transactions').get();
+      
+      // 4. Hapus semua transaksi satu per satu
+      final batch = _firestore.batch();
+      for (var doc in transactionsSnapshot.docs) {
+        batch.delete(walletRef.collection('transactions').doc(doc.id));
+      }
+      
+      // 5. Hapus dokumen dompet
+      batch.delete(walletRef);
+      
+      // 6. Commit batch
+      await batch.commit();
+    } catch (e) {
+      debugPrint('Error menghapus dompet: ${e.toString()}');
+      throw Exception('Gagal menghapus dompet: ${e.toString()}');
+    }
   }
 
   /// Mengirim undangan untuk berbagi dompet
@@ -106,7 +128,7 @@ class WalletService {
       throw Exception('Dompet tidak ditemukan');
     }
 
-    Wallet wallet = Wallet.fromMap({'id': walletDoc.id, ...walletDoc.data()!});
+    WalletModel wallet = WalletModel.fromMap({'id': walletDoc.id, ...walletDoc.data()!});
     
     // Tambahkan undangan ke wallet
     wallet = wallet.addInvitation(email);
@@ -129,7 +151,7 @@ class WalletService {
       throw Exception('Dompet tidak ditemukan');
     }
 
-    Wallet wallet = Wallet.fromMap({'id': walletDoc.id, ...walletDoc.data()!});
+    WalletModel wallet = WalletModel.fromMap({'id': walletDoc.id, ...walletDoc.data()!});
     
     // Update status undangan
     wallet = wallet.updateInvitationStatus(email, response);
@@ -161,7 +183,7 @@ class WalletService {
           }
           
           for (var doc in snapshot.docs) {
-            final wallet = Wallet.fromMap({'id': doc.id, ...doc.data()});
+            final wallet = WalletModel.fromMap({'id': doc.id, ...doc.data()});
             
             // Cari undangan yang sesuai dengan email user dan statusnya pending
             final matchingInvitations = wallet.invitations.where(
@@ -178,5 +200,32 @@ class WalletService {
           
           return result;
         });
+  }
+  
+  /// Fungsi bantuan untuk menghapus transaksi transfer terkait dari dompet lain
+  Future<void> _deleteRelatedTransfers(String walletId) async {
+    try {
+      // Dapatkan semua transfer yang terkait dengan dompet ini
+      final transfersToWallet = await _firestore
+          .collectionGroup('transactions')
+          .where('destinationWalletId', isEqualTo: walletId)
+          .where('type', isEqualTo: 'transfer')
+          .get();
+      
+      // Hapus atau tandai transfer ini sebagai tidak valid
+      final batch = _firestore.batch();
+      for (var doc in transfersToWallet.docs) {
+        // Dapatkan path lengkap ke dokumen
+        final documentPath = doc.reference.path;
+        batch.delete(_firestore.doc(documentPath));
+      }
+      
+      if (transfersToWallet.docs.isNotEmpty) {
+        await batch.commit();
+      }
+    } catch (e) {
+      debugPrint('Error menghapus transfer terkait: ${e.toString()}');
+      // Kita tetap lanjutkan meski ada error pada bagian ini
+    }
   }
 }

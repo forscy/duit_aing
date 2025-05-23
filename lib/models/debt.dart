@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'enums.dart';
 
 /// Model untuk representasi hutang/piutang
-class Debt {
+class DebtModel {
   /// Identifier unik untuk hutang/piutang
   final String id;
   
@@ -34,8 +34,8 @@ class Debt {
   /// ID dompet yang digunakan untuk membayar hutang (jika sudah dibayar)
   final String? paymentWalletId;
   
-  /// Constructor untuk Debt
-  Debt({
+  /// Constructor untuk DebtModel
+  DebtModel({
     required this.id,
     required this.walletId,
     required this.personName,
@@ -49,8 +49,8 @@ class Debt {
   });
   
   /// Factory constructor untuk membuat instance dari data Firebase
-  factory Debt.fromMap(Map<String, dynamic> map) {
-    return Debt(
+  factory DebtModel.fromMap(Map<String, dynamic> map) {
+    return DebtModel(
       id: map['id'] ?? '',
       walletId: map['walletId'] ?? '',
       personName: map['personName'] ?? '',
@@ -90,8 +90,8 @@ class Debt {
     };
   }
   
-  /// Membuat salinan Debt dengan nilai yang baru
-  Debt copyWith({
+  /// Membuat salinan DebtModel dengan nilai yang baru
+  DebtModel copyWith({
     String? id,
     String? walletId,
     String? personName,
@@ -103,7 +103,7 @@ class Debt {
     Timestamp? paidAt,
     String? paymentWalletId,
   }) {
-    return Debt(
+    return DebtModel(
       id: id ?? this.id,
       walletId: walletId ?? this.walletId,
       personName: personName ?? this.personName,

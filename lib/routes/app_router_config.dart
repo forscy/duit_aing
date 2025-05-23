@@ -14,6 +14,7 @@ import '../ui/pages/login_page.dart';
 import '../ui/pages/register_page.dart';
 import '../ui/pages/forgot_password_page.dart';
 import '../ui/pages/add_transaction_page.dart';
+import '../ui/pages/database_migration_page.dart';
 import '../ui/widgets/auth_check.dart';
 import '../providers/auth_provider.dart';
 
@@ -82,7 +83,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const ForgotPasswordPage(),
       ),
       
-      // Wallet List route
+      // WalletModel List route
       GoRoute(
         path: '/wallet',
         name: 'wallets',
@@ -92,7 +93,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
       
-      // Wallet Detail route
+      // WalletModel Detail route
       GoRoute(
         path: '/wallet/:id',
         name: 'wallet-detail',
@@ -104,7 +105,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-        // Wallet Invitations route
+        // WalletModel Invitations route
       GoRoute(
         path: '/wallet-invitations',
         name: 'wallet-invitations',
@@ -113,7 +114,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           signedOutBuilder: LoginPage(),
         ),
       ),
-        // Add Transaction route
+        // Add TransactionModel route
       GoRoute(
         path: '/wallet/:id/add-transaction',
         name: 'add-transaction',
@@ -138,8 +139,17 @@ final routerProvider = Provider<GoRouter>((ref) {
               initialType: initialType,
             ),
             signedOutBuilder: const LoginPage(),
-          );
-        },
+          );        },
+      ),
+      
+      // Database Migration route
+      GoRoute(
+        path: '/database-migration',
+        name: 'database-migration',
+        builder: (context, state) => const AuthCheck(
+          signedInBuilder: DatabaseMigrationPage(),
+          signedOutBuilder: LoginPage(),
+        ),
       ),
     ],
     // Error handling

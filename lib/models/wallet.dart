@@ -58,7 +58,7 @@ class WalletInvitation {
 }
 
 /// Model untuk representasi dompet
-class Wallet {
+class WalletModel {
   /// Identifier unik untuk dompet
   final String id;
   
@@ -83,8 +83,8 @@ class Wallet {
   /// Waktu pembuatan dompet
   final Timestamp createdAt;
   
-  /// Constructor untuk Wallet
-  Wallet({
+  /// Constructor untuk WalletModel
+  WalletModel({
     required this.id,
     required this.ownerId,
     required this.name,
@@ -96,7 +96,7 @@ class Wallet {
   });
   
   /// Factory constructor untuk membuat instance dari data Firebase
-  factory Wallet.fromMap(Map<String, dynamic> map) {
+  factory WalletModel.fromMap(Map<String, dynamic> map) {
     // Parse invitations list
     List<WalletInvitation> invitationsList = [];
     if (map['invitations'] != null) {
@@ -105,7 +105,7 @@ class Wallet {
         .toList();
     }
     
-    return Wallet(
+    return WalletModel(
       id: map['id'] ?? '',
       ownerId: map['ownerId'] ?? '',
       name: map['name'] ?? '',
@@ -136,8 +136,8 @@ class Wallet {
     };
   }
   
-  /// Membuat salinan Wallet dengan nilai yang baru
-  Wallet copyWith({
+  /// Membuat salinan WalletModel dengan nilai yang baru
+  WalletModel copyWith({
     String? id,
     String? ownerId,
     String? name,
@@ -147,7 +147,7 @@ class Wallet {
     List<WalletInvitation>? invitations,
     Timestamp? createdAt,
   }) {
-    return Wallet(
+    return WalletModel(
       id: id ?? this.id,
       ownerId: ownerId ?? this.ownerId,
       name: name ?? this.name,
@@ -160,7 +160,7 @@ class Wallet {
   }
   
   /// Menambahkan undangan baru ke dompet
-  Wallet addInvitation(String email) {
+  WalletModel addInvitation(String email) {
     // Periksa apakah email sudah diundang atau sudah dalam daftar sharedWith
     if (sharedWith.contains(email) || 
         invitations.any((invitation) => invitation.email == email)) {
@@ -183,7 +183,7 @@ class Wallet {
   }
   
   /// Memperbarui status undangan
-  Wallet updateInvitationStatus(String email, InvitationStatus newStatus) {
+  WalletModel updateInvitationStatus(String email, InvitationStatus newStatus) {
     final updatedInvitations = invitations.map((invitation) {
       if (invitation.email == email) {
         return invitation.copyWith(status: newStatus);

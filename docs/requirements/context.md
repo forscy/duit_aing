@@ -44,7 +44,7 @@ Berdasarkan user story yang ada di dokumentasi, aplikasi ini dirancang untuk mem
    - Visualisasi data dalam bentuk pie chart
 
 ## Struktur Aplikasi
-1. **Models**: Representasi data utama seperti User, Wallet, Transaction, dan Debt dengan enum pendukung.
+1. **Models**: Representasi data utama seperti User, WalletModel, TransactionModel, dan DebtModel dengan enum pendukung.
 2. **Services**: Layer untuk interaksi dengan Firebase (Auth dan Firestore).
 3. **Providers**: Menggunakan Riverpod untuk state management dan akses data.
 4. **Routes**: Manajemen navigasi dengan Go Router.
@@ -55,7 +55,7 @@ Berdasarkan checklist di dokumentasi, sepertinya project ini masih dalam tahap p
 
 ## Arsitektur Data
 1. Aplikasi menggunakan Cloud Firestore dengan struktur koleksi untuk wallets, transactions, dan debts.
-2. Relasi antar entitas ditangani dengan referensi ID (seperti walletId di dalam Transaction).
+2. Relasi antar entitas ditangani dengan referensi ID (seperti walletId di dalam TransactionModel).
 3. Sistem enumerasi untuk tipe-tipe data seperti WalletVisibility, TransactionType, DebtStatus, dan DebtKind.
 
 ## Kesimpulan

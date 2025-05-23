@@ -10,14 +10,14 @@ final walletServiceProvider = Provider<WalletService>((ref) {
 });
 
 /// Provider untuk stream daftar wallet
-final walletListProvider = StreamProvider<List<Wallet>>((ref) {
+final walletListProvider = StreamProvider<List<WalletModel>>((ref) {
   final walletService = ref.watch(walletServiceProvider);
   return walletService.getWallets();
 });
 
 /// Provider untuk wallet yang sedang dipilih (detail)
 /// Menggunakan StreamProvider agar reaktif terhadap perubahan data wallet
-final selectedWalletProvider = StreamProvider.family<Wallet?, String>((ref, walletId) {
+final selectedWalletProvider = StreamProvider.family<WalletModel?, String>((ref, walletId) {
   final walletService = ref.watch(walletServiceProvider);
   // Gunakan stream agar bisa memperbarui UI secara otomatis saat data berubah
   return walletService.watchWalletById(walletId);
@@ -40,7 +40,7 @@ class WalletNotifier extends StateNotifier<AsyncValue<void>> {
 
   WalletNotifier(this._walletService) : super(const AsyncValue.data(null));
 
-  Future<Wallet> createWallet(String name, WalletVisibility visibility) async {
+  Future<WalletModel> createWallet(String name, WalletVisibility visibility) async {
     state = const AsyncValue.loading();
     try {
       final wallet = await _walletService.createWallet(name, visibility);
@@ -52,7 +52,7 @@ class WalletNotifier extends StateNotifier<AsyncValue<void>> {
     }
   }
 
-  Future<void> updateWallet(Wallet wallet) async {
+  Future<void> updateWallet(WalletModel wallet) async {
     state = const AsyncValue.loading();
     try {
       await _walletService.updateWallet(wallet);

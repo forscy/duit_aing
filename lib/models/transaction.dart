@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'enums.dart';
 
 /// Model untuk representasi transaksi keuangan
-class Transaction {
+class TransactionModel {
   /// Identifier unik untuk transaksi
   final String id;
   
@@ -25,8 +25,8 @@ class Transaction {
   /// Waktu terjadinya transaksi
   final Timestamp timestamp;
   
-  /// Constructor untuk Transaction
-  Transaction({
+  /// Constructor untuk TransactionModel
+  TransactionModel({
     required this.id,
     required this.walletId,
     required this.amount,
@@ -37,8 +37,8 @@ class Transaction {
   });
   
   /// Factory constructor untuk membuat instance dari data Firebase
-  factory Transaction.fromMap(Map<String, dynamic> map) {
-    return Transaction(
+  factory TransactionModel.fromMap(Map<String, dynamic> map) {
+    return TransactionModel(
       id: map['id'] ?? '',
       walletId: map['walletId'] ?? '',
       amount: (map['amount'] ?? 0).toDouble(),
@@ -67,8 +67,8 @@ class Transaction {
     };
   }
   
-  /// Membuat salinan Transaction dengan nilai yang baru
-  Transaction copyWith({
+  /// Membuat salinan TransactionModel dengan nilai yang baru
+  TransactionModel copyWith({
     String? id,
     String? walletId,
     double? amount,
@@ -77,7 +77,7 @@ class Transaction {
     String? destinationWalletId,
     Timestamp? timestamp,
   }) {
-    return Transaction(
+    return TransactionModel(
       id: id ?? this.id,
       walletId: walletId ?? this.walletId,
       amount: amount ?? this.amount,
