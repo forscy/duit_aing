@@ -342,22 +342,23 @@ class DebtListPage extends ConsumerWidget {
       },
     );
   }
-
   void _showDebtDetailDialog(BuildContext context, WidgetRef ref, DebtModel debt) {
     final walletsAsync = ref.watch(walletListProvider);
+    
+    String? selectedPaymentWalletId;
+    String previousAmount = '';
+    final amountController = TextEditingController(
+      text: debt.status == DebtStatus.unpaid 
+          ? debt.amount.toString() 
+          : '0'
+    );
+    bool isPartialPayment = false;
     
     showDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
-            String? selectedPaymentWalletId;
-            final amountController = TextEditingController(
-              text: debt.status == DebtStatus.unpaid 
-                  ? debt.amount.toString() 
-                  : '0'
-            );
-            bool isPartialPayment = false;
 
             return AlertDialog(
               title: const Text('Detail Hutang/Piutang'),
@@ -373,34 +374,46 @@ class DebtListPage extends ConsumerWidget {
                       if (!debt.isActive) const Text('Status: Nonaktif', style: TextStyle(color: Colors.red)),
                       Text('Keterangan: ${debt.description}'),
                       if (debt.walletId.isNotEmpty)
-                        Text('Dompet: ${wallets.firstWhere((w) => w.id == debt.walletId).name}'),
-                      if (debt.status == DebtStatus.unpaid) ...[
+                        Text('Dompet: ${wallets.firstWhere((w) => w.id == debt.walletId).name}'),                      if (debt.status == DebtStatus.unpaid) ...[
                         const SizedBox(height: 16),
                         Row(
-                          children: [
+                          children: [                            
                             Checkbox(
                               value: isPartialPayment,
                               onChanged: (value) {
                                 setState(() {
                                   isPartialPayment = value ?? false;
-                                  if (!isPartialPayment) {
-                                    amountController.text = debt.amount.toString();
-                                  }
                                 });
+                                
+                                if (!isPartialPayment) {
+                                  // Simpan nilai sebelumnya sebelum mengubah ke total
+                                  previousAmount = amountController.text;
+                                  amountController.text = debt.amount.toString();
+                                } else if (previousAmount.isNotEmpty) {
+                                  // Kembalikan nilai sebelumnya jika ada
+                                  amountController.text = previousAmount;
+                                } else {
+                                  // Jika tidak ada nilai sebelumnya, kosongkan
+                                  amountController.text = '';
+                                }
                               },
                             ),
                             const Text('Pembayaran Sebagian'),
                           ],
                         ),
                         if (isPartialPayment) ...[
-                          const SizedBox(height: 8),
-                          TextField(
+                          const SizedBox(height: 8),                          TextField(
                             controller: amountController,
                             keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: 'Jumlah Pembayaran',
-                              border: OutlineInputBorder(),
+                              border: const OutlineInputBorder(),
+                              helperText: 'Maksimal: ${CurrencyFormatter.format(debt.amount)}',
                             ),
+                            onChanged: (value) {
+                              // Update nilai sebelumnya saat user mengetik
+                              previousAmount = value;
+                            },
                             inputFormatters: [
                               FilteringTextInputFormatter.digitsOnly,
                             ],
@@ -437,14 +450,69 @@ class DebtListPage extends ConsumerWidget {
                 TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: const Text('Tutup'),
-                ),
-                TextButton(
-                  onPressed: () {
+                ),                TextButton(
+                  onPressed: () async {
+                    if (debt.walletId.isNotEmpty) {
+                      // Jika akan dinonaktifkan, buat transaksi untuk mengembalikan uang
+                      if (debt.isActive) {
+                        // Untuk hutang: tarik uang dari dompet (expense)
+                        // Untuk piutang: masukkan uang ke dompet (income)
+                        final transaction = model.TransactionModel(
+                          id: const Uuid().v4(),
+                          walletId: debt.walletId,
+                          amount: debt.amount,
+                          description: 'Pembatalan ${debt.kind == DebtKind.debt ? "hutang" : "piutang"} - ${debt.personName}',
+                          type: debt.kind == DebtKind.debt ? TransactionType.expense : TransactionType.income,
+                          timestamp: Timestamp.now(),
+                        );
+
+                        try {
+                          await ref.read(transactionNotifierProvider.notifier).addTransaction(transaction);
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Error membuat transaksi: ${e.toString()}')),
+                            );
+                            return;
+                          }
+                        }
+                      } else {
+                        // Jika akan diaktifkan kembali, buat transaksi untuk mengembalikan ke kondisi semula
+                        final transaction = model.TransactionModel(
+                          id: const Uuid().v4(),
+                          walletId: debt.walletId,
+                          amount: debt.amount,
+                          description: 'Pengaktifan ${debt.kind == DebtKind.debt ? "hutang" : "piutang"} - ${debt.personName}',
+                          type: debt.kind == DebtKind.debt ? TransactionType.income : TransactionType.expense,
+                          timestamp: Timestamp.now(),
+                        );
+
+                        try {
+                          await ref.read(transactionNotifierProvider.notifier).addTransaction(transaction);
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Error membuat transaksi: ${e.toString()}')),
+                            );
+                            return;
+                          }
+                        }
+                      }
+                    }
+
+                    // Toggle status hutang
                     ref.read(debtServiceProvider).toggleDebtStatus(debt.id, !debt.isActive);
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(debt.isActive ? 'Hutang dinonaktifkan' : 'Hutang diaktifkan')),
-                    );
+                    
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(
+                          debt.isActive 
+                            ? 'Hutang dinonaktifkan dan saldo dompet disesuaikan' 
+                            : 'Hutang diaktifkan dan saldo dompet disesuaikan'
+                        )),
+                      );
+                    }
                   },
                   child: Text(debt.isActive ? 'Nonaktifkan' : 'Aktifkan'),
                 ),
