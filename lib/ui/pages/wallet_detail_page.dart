@@ -13,12 +13,10 @@ class WalletDetailPage extends ConsumerWidget {
   const WalletDetailPage({
     Key? key,
     required this.walletId,
-  }) : super(key: key);
-  @override
+  }) : super(key: key);  @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Make sure wallet state is reset when needed
-    ref.watch(walletResetProvider);
-    
+    // Gunakan provider yang autoinvalidate ketika wallet berubah 
+    // Dapatkan data wallet dengan watch untuk memastikan UI diupdate ketika data berubah
     final walletAsync = ref.watch(selectedWalletProvider(walletId));
 
     return Scaffold(
@@ -30,8 +28,7 @@ class WalletDetailPage extends ConsumerWidget {
             onPressed: () => _showWalletOptions(context, ref),
           ),
         ],
-      ),
-      body: walletAsync.when(
+      ),      body: walletAsync.when(
         data: (wallet) {
           if (wallet == null) {
             return const Center(
@@ -311,13 +308,16 @@ class WalletDetailPage extends ConsumerWidget {
                 leading: const Icon(Icons.edit),
                 title: const Text('Edit Dompet'),
                 onTap: () {
-                  context.pop(); // Close the bottom sheet
-                  ref.read(selectedWalletProvider(walletId)).whenData(
+                  context.pop(); // Close the bottom sheet                  // Gunakan future untuk operasi one-time ini
+                  ref.read(selectedWalletProvider(walletId).future).then(
                     (wallet) {
                       if (wallet != null) {
                         _showEditWalletDialog(context, ref, wallet);
                       }
                     },
+                    onError: (error) => ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error: ${error.toString()}')),
+                    ),
                   );
                 },
               ),
@@ -325,13 +325,16 @@ class WalletDetailPage extends ConsumerWidget {
                 leading: const Icon(Icons.delete),
                 title: const Text('Hapus Dompet'),
                 onTap: () {
-                  context.pop(); // Close the bottom sheet
-                  ref.read(selectedWalletProvider(walletId)).whenData(
+                  context.pop(); // Close the bottom sheet                  // Gunakan future untuk operasi one-time ini
+                  ref.read(selectedWalletProvider(walletId).future).then(
                     (wallet) {
                       if (wallet != null) {
                         _showDeleteConfirmation(context, ref, wallet);
                       }
                     },
+                    onError: (error) => ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error: ${error.toString()}')),
+                    ),
                   );
                 },
               ),
@@ -391,11 +394,14 @@ class WalletDetailPage extends ConsumerWidget {
                           try {
                             final updatedWallet = wallet.copyWith(
                               name: nameController.text.trim(),
-                            );
-
-                            await ref
+                            );                            await ref
                                 .read(walletNotifierProvider.notifier)
-                                .updateWallet(updatedWallet);                            if (context.mounted) {
+                                .updateWallet(updatedWallet);
+                            
+                            // Tidak perlu invalidasi manual lagi karena menggunakan StreamProvider
+                            // yang akan otomatis update ketika data berubah di Firestore
+                            
+                            if (context.mounted) {
                               context.pop();
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(

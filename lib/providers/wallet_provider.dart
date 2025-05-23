@@ -16,9 +16,11 @@ final walletListProvider = StreamProvider<List<Wallet>>((ref) {
 });
 
 /// Provider untuk wallet yang sedang dipilih (detail)
-final selectedWalletProvider = FutureProvider.family<Wallet?, String>((ref, walletId) async {
+/// Menggunakan StreamProvider agar reaktif terhadap perubahan data wallet
+final selectedWalletProvider = StreamProvider.family<Wallet?, String>((ref, walletId) {
   final walletService = ref.watch(walletServiceProvider);
-  return walletService.getWalletById(walletId);
+  // Gunakan stream agar bisa memperbarui UI secara otomatis saat data berubah
+  return walletService.watchWalletById(walletId);
 });
 
 /// Provider untuk invitation wallet

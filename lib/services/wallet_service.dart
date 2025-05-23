@@ -39,14 +39,27 @@ class WalletService {
               .toList();
         });
   }
-  
-  /// Mendapatkan detail dompet berdasarkan ID
+    /// Mendapatkan detail dompet berdasarkan ID
   Future<Wallet?> getWalletById(String walletId) async {
     final doc = await _firestore.collection('wallets').doc(walletId).get();
     if (!doc.exists) {
       return null;
     }
     return Wallet.fromMap({'id': doc.id, ...doc.data()!});
+  }
+  
+  /// Mendapatkan stream data wallet untuk memantau perubahan secara reaktif
+  Stream<Wallet?> watchWalletById(String walletId) {
+    return _firestore
+        .collection('wallets')
+        .doc(walletId)
+        .snapshots()
+        .map((doc) {
+          if (!doc.exists) {
+            return null;
+          }
+          return Wallet.fromMap({'id': doc.id, ...doc.data()!});
+        });
   }
 
   /// Membuat dompet baru
