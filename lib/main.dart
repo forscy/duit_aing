@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'firebase_options.dart';
-import 'routes/app_routes.dart';
+import 'routes/app_router_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,18 +26,28 @@ void main() async {
     // tapi usernya akan menemukan masalah saat mencoba login
   }
   
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});  @override
-  Widget build(BuildContext context) {
-  return MaterialApp(
-      title: 'My App',
+class MyApp extends ConsumerWidget {
+  const MyApp({super.key});
+  
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Get the router from the provider
+    final router = ref.watch(routerProvider);
+    
+    return MaterialApp.router(
+      title: 'Duit Aing',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blue,
+          brightness: Brightness.light,
+        ),
+        useMaterial3: true,
       ),
-      initialRoute: '/',
+      // Use GoRouter configuration
+      routerConfig: router,
     );
   }
 }
