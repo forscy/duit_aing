@@ -1,5 +1,7 @@
 import 'package:duit_aing/models/enums.dart';
+import 'package:duit_aing/models/transaction.dart' as model;
 import 'package:duit_aing/models/wallet.dart';
+import 'package:duit_aing/providers/transaction_provider.dart';
 import 'package:duit_aing/providers/wallet_provider.dart';
 import 'package:duit_aing/utils/currency_formatter.dart';
 import 'package:flutter/material.dart';
@@ -45,8 +47,12 @@ class WalletDetailPage extends ConsumerWidget {
                 const SizedBox(height: 24),
                 _buildActions(context, ref, wallet),
                 const SizedBox(height: 24),
+                _buildTransactionList(context, ref, wallet.id),
+                const SizedBox(height: 24),
                 if (wallet.visibility == WalletVisibility.shared)
                   _buildSharedWithSection(context, wallet),
+                const SizedBox(height: 24),
+                _buildTransactionList(context, ref, walletId),
               ],
             ),
           );
@@ -55,13 +61,10 @@ class WalletDetailPage extends ConsumerWidget {
         error: (error, stackTrace) => Center(
           child: Text('Error: ${error.toString()}'),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
+      ),      floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Navigate to add transaction page (Implementation to be added)
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Tambah transaksi akan diimplementasikan')),
-          );
+          // Navigate to add transaction page
+          context.push('/wallet/${walletId}/add-transaction');
         },
         child: const Icon(Icons.add),
         tooltip: 'Tambah Transaksi',
@@ -139,15 +142,13 @@ class WalletDetailPage extends ConsumerWidget {
           physics: const NeverScrollableScrollPhysics(),
           mainAxisSpacing: 16,
           crossAxisSpacing: 16,
-          children: [
-            _buildActionItem(
+          children: [            _buildActionItem(
               context,
               Icons.add_circle,
               'Top Up',
               () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Fitur Top Up akan diimplementasikan')),
-                );
+                // Navigate to add transaction page with income type pre-selected
+                context.push('/wallet/${wallet.id}/add-transaction?type=income');
               },
             ),
             _buildActionItem(
@@ -155,9 +156,8 @@ class WalletDetailPage extends ConsumerWidget {
               Icons.remove_circle,
               'Tarik',
               () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Fitur Tarik akan diimplementasikan')),
-                );
+                // Navigate to add transaction page with expense type pre-selected
+                context.push('/wallet/${wallet.id}/add-transaction?type=expense');
               },
             ),
             _buildActionItem(
@@ -165,9 +165,8 @@ class WalletDetailPage extends ConsumerWidget {
               Icons.swap_horiz,
               'Transfer',
               () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Fitur Transfer akan diimplementasikan')),
-                );
+                // Navigate to add transaction page with transfer type pre-selected
+                context.push('/wallet/${wallet.id}/add-transaction?type=transfer');
               },
             ),
             if (wallet.visibility == WalletVisibility.shared)
@@ -469,7 +468,7 @@ class WalletDetailPage extends ConsumerWidget {
                                 .read(walletNotifierProvider.notifier)
                                 .deleteWallet(wallet.id);                            if (context.mounted) {
                               context.pop(); // Close the dialog
-                              context.go('/wallet'); // Navigate back to wallet list
+                              context.push('/wallet'); // Navigate back to wallet list
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Dompet berhasil dihapus'),
@@ -615,6 +614,122 @@ class WalletDetailPage extends ConsumerWidget {
           ],
         );
       },
+    );
+  }
+
+  Widget _buildTransactionList(BuildContext context, WidgetRef ref, String walletId) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Riwayat Transaksi',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 16),
+        // Watch transaction stream for this wallet
+        Consumer(
+          builder: (context, ref, child) {
+            final transactionsAsync = ref.watch(walletTransactionsProvider(walletId));
+            
+            return transactionsAsync.when(
+              data: (transactions) {
+                if (transactions.isEmpty) {
+                  return const Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(
+                        child: Text(
+                          'Belum ada transaksi',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                
+                return Card(
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: transactions.length,
+                    separatorBuilder: (context, index) => const Divider(height: 1),
+                    itemBuilder: (context, index) {
+                      final transaction = transactions[index];
+                      return _buildTransactionItem(context, transaction);
+                    },
+                  ),
+                );
+              },
+              loading: () => const Card(
+                child: Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+              ),
+              error: (error, _) => Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Center(
+                    child: Text('Error: ${error.toString()}'),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTransactionItem(BuildContext context, model.Transaction transaction) {
+    // Determine icon and color based on transaction type
+    IconData icon;
+    Color color;
+    String typeText;
+    
+    switch (transaction.type) {
+      case TransactionType.income:
+        icon = Icons.add_circle;
+        color = Colors.green;
+        typeText = 'Pemasukan';
+        break;
+      case TransactionType.expense:
+        icon = Icons.remove_circle;
+        color = Colors.red;
+        typeText = 'Pengeluaran';
+        break;
+      case TransactionType.transfer:
+        icon = Icons.swap_horiz;
+        color = Colors.blue;
+        typeText = 'Transfer';
+        break;
+    }
+    
+    // Format date
+    final date = transaction.timestamp.toDate();
+    final formattedDate = 
+        '${date.day}/${date.month}/${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+    
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundColor: color.withOpacity(0.2),
+        child: Icon(icon, color: color),
+      ),
+      title: Text(transaction.description),
+      subtitle: Text('$typeText • $formattedDate'),
+      trailing: Text(
+        CurrencyFormatter.format(transaction.amount),
+        style: TextStyle(
+          color: transaction.type == TransactionType.expense ? Colors.red : 
+                 transaction.type == TransactionType.income ? Colors.green : Colors.blue,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
   }
 }

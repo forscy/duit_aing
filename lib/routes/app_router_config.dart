@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:duit_aing/models/enums.dart';
 
 import '../ui/pages/home_page.dart';
 import '../ui/pages/wallet_list_page.dart';
@@ -12,6 +13,7 @@ import '../ui/pages/wallet_invitations_page.dart';
 import '../ui/pages/login_page.dart';
 import '../ui/pages/register_page.dart';
 import '../ui/pages/forgot_password_page.dart';
+import '../ui/pages/add_transaction_page.dart';
 import '../ui/widgets/auth_check.dart';
 import '../providers/auth_provider.dart';
 
@@ -102,8 +104,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      
-      // Wallet Invitations route
+        // Wallet Invitations route
       GoRoute(
         path: '/wallet-invitations',
         name: 'wallet-invitations',
@@ -111,6 +112,34 @@ final routerProvider = Provider<GoRouter>((ref) {
           signedInBuilder: WalletInvitationsPage(),
           signedOutBuilder: LoginPage(),
         ),
+      ),
+        // Add Transaction route
+      GoRoute(
+        path: '/wallet/:id/add-transaction',
+        name: 'add-transaction',
+        builder: (context, state) {
+          final walletId = state.pathParameters['id'] ?? '';
+          final typeParam = state.uri.queryParameters['type'];
+          TransactionType? initialType;
+          
+          if (typeParam != null) {
+            try {
+              initialType = TransactionType.values.firstWhere(
+                (e) => e.toString().split('.').last == typeParam
+              );
+            } catch (_) {
+              // Invalid type parameter, use default (null)
+            }
+          }
+          
+          return AuthCheck(
+            signedInBuilder: AddTransactionPage(
+              walletId: walletId,
+              initialType: initialType,
+            ),
+            signedOutBuilder: const LoginPage(),
+          );
+        },
       ),
     ],
     // Error handling
