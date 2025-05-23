@@ -16,7 +16,15 @@ class WalletListPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dompet Saya'),
-        actions: [          IconButton(
+        // back button
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            context.go('/');
+          },
+        ),
+        actions: [          
+          IconButton(
             icon: const Icon(Icons.notifications),
             onPressed: () {
               context.push('/wallet-invitations');

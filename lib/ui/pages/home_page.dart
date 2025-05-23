@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../providers/auth_provider.dart';
+import '../widgets/sign_out_button.dart';
+import '../widgets/settings_bottom_sheet.dart';
 
 /// Halaman utama aplikasi
-class HomePage extends StatelessWidget {
+class HomePage extends ConsumerWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Duit Aing'),
+        actions: const [
+          SignOutButton(buttonType: SignOutButtonType.icon),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -25,37 +32,50 @@ class HomePage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Widget _buildUserGreeting() {
-    return const Card(
+  }  Widget _buildUserGreeting() {
+    return Card(
       child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 30,
-              child: Icon(Icons.person, size: 30),
-            ),
-            SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.all(16),
+        child: Consumer(
+          builder: (context, ref, _) {
+            final user = ref.watch(currentUserProvider);
+            final userName = user?.email?.split('@').first ?? 'User';
+            
+            return Row(
               children: [
-                Text(
-                  'Selamat Datang',
-                  style: TextStyle(fontSize: 16),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'User',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                CircleAvatar(
+                  radius: 30,
+                  backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                  child: Text(
+                    userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                 ),
+                const SizedBox(width: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Selamat Datang',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      userName,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ],
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
@@ -116,14 +136,15 @@ class HomePage extends StatelessWidget {
                   const SnackBar(content: Text('Fitur Laporan belum diimplementasi')),
                 );
               },
-            ),
-            _buildFeatureItem(
+            ),            _buildFeatureItem(
               context,
               Icons.settings,
               'Pengaturan',
               () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Fitur Pengaturan belum diimplementasi')),
+                // Menampilkan dialog opsi pengaturan
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) => const SettingsBottomSheet(),
                 );
               },
             ),
