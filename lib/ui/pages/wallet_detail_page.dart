@@ -1,6 +1,5 @@
 import 'package:duit_aing/models/enums.dart';
 import 'package:duit_aing/models/transaction.dart';
-import 'package:duit_aing/models/wallet.dart';
 import 'package:duit_aing/providers/transaction_provider.dart';
 import 'package:duit_aing/providers/wallet_provider.dart';
 import 'package:duit_aing/ui/widgets/wallet/delete_wallet_dialog.dart';
