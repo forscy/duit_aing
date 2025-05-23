@@ -15,6 +15,7 @@ import '../ui/pages/register_page.dart';
 import '../ui/pages/forgot_password_page.dart';
 import '../ui/pages/add_transaction_page.dart';
 import '../ui/pages/database_migration_page.dart';
+import '../ui/pages/debt_list_page.dart';
 import '../ui/widgets/auth_check.dart';
 import '../providers/auth_provider.dart';
 
@@ -148,6 +149,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'database-migration',
         builder: (context, state) => const AuthCheck(
           signedInBuilder: DatabaseMigrationPage(),
+          signedOutBuilder: LoginPage(),
+        ),
+      ),
+      
+      // Debt List route
+      GoRoute(
+        path: '/debt',
+        name: 'debt',
+        builder: (context, state) => const AuthCheck(
+          signedInBuilder: DebtListPage(),
           signedOutBuilder: LoginPage(),
         ),
       ),

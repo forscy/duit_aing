@@ -34,6 +34,9 @@ class DebtModel {
   /// ID dompet yang digunakan untuk membayar hutang (jika sudah dibayar)
   final String? paymentWalletId;
   
+  /// Status aktif/nonaktif
+  final bool isActive;
+  
   /// Constructor untuk DebtModel
   DebtModel({
     required this.id,
@@ -46,6 +49,7 @@ class DebtModel {
     required this.createdAt,
     this.paidAt,
     this.paymentWalletId,
+    this.isActive = true,
   });
   
   /// Factory constructor untuk membuat instance dari data Firebase
@@ -71,6 +75,7 @@ class DebtModel {
               ? (map['paidAt'] as Timestamp)
               : null,
       paymentWalletId: map['paymentWalletId'],
+      isActive: map['isActive'] ?? true,
     );
   }
   
@@ -87,6 +92,7 @@ class DebtModel {
       'createdAt': createdAt,
       'paidAt': paidAt,
       'paymentWalletId': paymentWalletId,
+      'isActive': isActive,
     };
   }
   
@@ -102,6 +108,7 @@ class DebtModel {
     Timestamp? createdAt,
     Timestamp? paidAt,
     String? paymentWalletId,
+    bool? isActive,
   }) {
     return DebtModel(
       id: id ?? this.id,
@@ -114,9 +121,9 @@ class DebtModel {
       createdAt: createdAt ?? this.createdAt,
       paidAt: paidAt ?? this.paidAt,
       paymentWalletId: paymentWalletId ?? this.paymentWalletId,
+      isActive: isActive ?? this.isActive,
     );
   }
 }
 
 /// Shorthand dari Firestore Timestamp untuk model
- 

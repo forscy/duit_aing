@@ -43,15 +43,12 @@ class FeatureGridWidget extends StatelessWidget {
                   const SnackBar(content: Text('Fitur Transaksi belum diimplementasi')),
                 );
               },
-            ),
-            _buildFeatureItem(
+            ),            _buildFeatureItem(
               context,
               Icons.attach_money,
               'Hutang',
               () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Fitur Hutang belum diimplementasi')),
-                );
+                context.go('/debt');
               },
             ),
             _buildFeatureItem(
