@@ -1,9 +1,8 @@
 import 'package:duit_aing/models/enums.dart';
-import 'package:duit_aing/models/transaction.dart' as model;
+import 'package:duit_aing/models/transaction.dart';
 import 'package:duit_aing/models/wallet.dart';
 import 'package:duit_aing/providers/transaction_provider.dart';
 import 'package:duit_aing/providers/wallet_provider.dart';
-import 'package:duit_aing/utils/currency_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -140,7 +139,7 @@ class WalletDetailPage extends ConsumerWidget {
     );
   }
 
-  void _showTransactionActions(BuildContext context, WidgetRef ref, model.TransactionModel transaction) async {
+  void _showTransactionActions(BuildContext context, WidgetRef ref, TransactionModel transaction) async {
     final result = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {

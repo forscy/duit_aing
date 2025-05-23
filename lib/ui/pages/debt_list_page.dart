@@ -24,7 +24,6 @@ class DebtListPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final debtsAsync = ref.watch(debtsStreamProvider);
-    final walletsAsync = ref.watch(walletListProvider);
 
     return DefaultTabController(
       length: 2,
