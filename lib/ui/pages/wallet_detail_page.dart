@@ -14,9 +14,11 @@ class WalletDetailPage extends ConsumerWidget {
     Key? key,
     required this.walletId,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Make sure wallet state is reset when needed
+    ref.watch(walletResetProvider);
+    
     final walletAsync = ref.watch(selectedWalletProvider(walletId));
 
     return Scaffold(

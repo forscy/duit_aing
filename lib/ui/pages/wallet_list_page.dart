@@ -8,9 +8,12 @@ import 'package:go_router/go_router.dart';
 /// Halaman untuk menampilkan daftar wallet
 class WalletListPage extends ConsumerWidget {
   const WalletListPage({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Make sure wallet state is reset when needed
+    ref.watch(walletResetProvider);
+    
+    // Now watch the wallet list
     final walletsAsync = ref.watch(walletListProvider);
 
     return Scaffold(

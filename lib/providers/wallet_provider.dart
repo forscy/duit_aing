@@ -2,6 +2,7 @@ import 'package:duit_aing/models/enums.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/wallet.dart';
 import '../services/wallet_service.dart';
+import 'auth_provider.dart';
 
 /// Provider untuk layanan wallet
 final walletServiceProvider = Provider<WalletService>((ref) {
@@ -99,4 +100,18 @@ class WalletNotifier extends StateNotifier<AsyncValue<void>> {
 final walletNotifierProvider = StateNotifierProvider<WalletNotifier, AsyncValue<void>>((ref) {
   final walletService = ref.watch(walletServiceProvider);
   return WalletNotifier(walletService);
+});
+
+/// Provider untuk menandai bahwa wallet state harus di-reset
+final walletResetProvider = Provider<void>((ref) {
+  // Listen to auth changes to automatically reset wallet state when user logs out
+  ref.listen(authStateProvider, (previous, next) {
+    next.whenData((user) {
+      if (user == null) {
+        // Reset all wallet providers when user logs out
+        ref.invalidate(walletListProvider);
+        ref.invalidate(walletInvitationsProvider);
+      }
+    });
+  });
 });

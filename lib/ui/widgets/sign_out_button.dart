@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/wallet_provider.dart';
 
 /// Widget untuk tombol sign out
 class SignOutButton extends ConsumerWidget {
@@ -17,12 +18,22 @@ class SignOutButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authNotifier = ref.watch(authNotifierProvider.notifier);
-    final isLoading = ref.watch(authNotifierProvider) is AsyncLoading;
-
-    // Handler untuk proses logout
+    final isLoading = ref.watch(authNotifierProvider) is AsyncLoading;    // Handler untuk proses logout
     Future<void> handleSignOut() async {
       try {
+        // Invalidate wallet providers before logging out to ensure clean state
+        ref.invalidate(walletListProvider);
+        ref.invalidate(walletInvitationsProvider);
+        ref.invalidate(selectedWalletProvider);
+        ref.invalidate(walletServiceProvider);
+        
+        // Clear any cached data in the wallet service
+        final walletService = ref.read(walletServiceProvider);
+        walletService.clearState();
+        
+        // Perform logout
         await authNotifier.logout();
+        
         if (context.mounted) {
           context.go('/login');
           ScaffoldMessenger.of(context).showSnackBar(

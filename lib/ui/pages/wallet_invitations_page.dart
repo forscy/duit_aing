@@ -7,9 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Halaman untuk menampilkan undangan dompet
 class WalletInvitationsPage extends ConsumerWidget {
   const WalletInvitationsPage({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Make sure wallet state is reset when needed
+    ref.watch(walletResetProvider);
+    
     final invitationsAsync = ref.watch(walletInvitationsProvider);
 
     return Scaffold(

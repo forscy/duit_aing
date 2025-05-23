@@ -11,7 +11,7 @@ final authServiceProvider = Provider<AuthService>((ref) {
 final authStateProvider = StreamProvider<User?>((ref) {
   final authService = ref.watch(authServiceProvider);
   return authService.authStateChanges;
-});
+}, name: 'authStateProvider');
 
 /// Provider untuk status operasi auth
 final authOperationStateProvider = StateProvider<AsyncValue<void>>((ref) {
@@ -67,9 +67,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
       state = AsyncValue.error(error, stackTrace);
       throw error;
     }
-  }
-
-  Future<void> logout() async {
+  }  Future<void> logout() async {
     state = const AsyncValue.loading();
     try {
       await _authService.signOut();

@@ -1,27 +1,36 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:duit_aing/models/enums.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import '../models/wallet.dart';
 
 /// Service untuk mengatur operasi CRUD pada dompet
 class WalletService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  /// Mendapatkan daftar dompet yang dimiliki atau dibagikan ke pengguna
+    /// Method untuk membersihkan state jika diperlukan
+  void clearState() {
+    // If we need to clear any cached data or state when a user logs out
+    // For example, we might want to discard any in-memory wallet data
+    debugPrint('WalletService: Clearing state after logout');
+    
+    // In a more complex implementation, we might have:
+    // _cachedWallets.clear();
+    // _pendingTransactions.clear();
+    // etc.
+  }/// Mendapatkan daftar dompet yang dimiliki atau dibagikan ke pengguna
   Stream<List<Wallet>> getWallets() {
+    // Using standard Stream transformation
     final user = _auth.currentUser;
     if (user == null) {
-      return Stream.value([]);
+      return Stream.value(<Wallet>[]);
     }
-
-    // Gunakan satu query saja untuk menyederhanakan kode
+    
     return _firestore
         .collection('wallets')
         .where('ownerId', isEqualTo: user.uid)
         .snapshots()
         .map((snapshot) {
-          // Konversi ke List<Wallet>
           return snapshot.docs
               .map((doc) => Wallet.fromMap({
                     'id': doc.id,
@@ -30,6 +39,7 @@ class WalletService {
               .toList();
         });
   }
+  
   /// Mendapatkan detail dompet berdasarkan ID
   Future<Wallet?> getWalletById(String walletId) async {
     final doc = await _firestore.collection('wallets').doc(walletId).get();
@@ -116,8 +126,7 @@ class WalletService {
         .collection('wallets')
         .doc(walletId)
         .update(wallet.toMap());
-  }
-  /// Mendapatkan undangan dompet untuk user saat ini
+  }  /// Mendapatkan undangan dompet untuk user saat ini
   Stream<List<Map<String, dynamic>>> getWalletInvitations() {
     final user = _auth.currentUser;
     if (user == null || user.email == null) {
@@ -132,12 +141,18 @@ class WalletService {
         .map((snapshot) {
           List<Map<String, dynamic>> result = [];
           
+          // Get current user again to ensure we're using the most up-to-date user
+          final currentUser = _auth.currentUser;
+          if (currentUser == null || currentUser.email == null) {
+            return [];
+          }
+          
           for (var doc in snapshot.docs) {
             final wallet = Wallet.fromMap({'id': doc.id, ...doc.data()});
             
             // Cari undangan yang sesuai dengan email user dan statusnya pending
             final matchingInvitations = wallet.invitations.where(
-              (inv) => inv.email == user.email && inv.status == InvitationStatus.pending
+              (inv) => inv.email == currentUser.email && inv.status == InvitationStatus.pending
             ).toList();
             
             if (matchingInvitations.isNotEmpty) {
