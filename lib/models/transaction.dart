@@ -24,7 +24,9 @@ class TransactionModel {
   
   /// Waktu terjadinya transaksi
   final Timestamp timestamp;
-  
+    /// Status transaksi (active/cancelled)
+  final bool isActive;
+
   /// Constructor untuk TransactionModel
   TransactionModel({
     required this.id,
@@ -34,6 +36,7 @@ class TransactionModel {
     required this.type,
     this.destinationWalletId,
     required this.timestamp,
+    this.isActive = true,
   });
   
   /// Factory constructor untuk membuat instance dari data Firebase
@@ -47,10 +50,10 @@ class TransactionModel {
         (e) => e.toString() == 'TransactionType.${map['type'] ?? 'expense'}',
         orElse: () => TransactionType.expense,
       ),
-      destinationWalletId: map['destinationWalletId'],
-      timestamp: map['timestamp'] != null 
+      destinationWalletId: map['destinationWalletId'],      timestamp: map['timestamp'] != null 
                  ? (map['timestamp'] as Timestamp)
                  : Timestamp.now(),
+      isActive: map['isActive'] ?? true,
     );
   }
   
@@ -64,6 +67,7 @@ class TransactionModel {
       'type': type.toString().split('.').last,
       'destinationWalletId': destinationWalletId,
       'timestamp': timestamp,
+      'isActive': isActive,
     };
   }
   
@@ -76,6 +80,7 @@ class TransactionModel {
     TransactionType? type,
     String? destinationWalletId,
     Timestamp? timestamp,
+    bool? isActive,
   }) {
     return TransactionModel(
       id: id ?? this.id,
@@ -85,9 +90,7 @@ class TransactionModel {
       type: type ?? this.type,
       destinationWalletId: destinationWalletId ?? this.destinationWalletId,
       timestamp: timestamp ?? this.timestamp,
+      isActive: isActive ?? this.isActive,
     );
   }
 }
-
-/// Shorthand dari Firestore Timestamp untuk model
- 

@@ -107,6 +107,200 @@ class TransactionNotifier extends StateNotifier<AsyncValue<void>> {
       state = const AsyncValue.data(null);
     } catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
+      rethrow;
+    }
+  }
+
+  /// Method untuk membatalkan transaksi
+  Future<void> cancelTransaction(TransactionModel transaction) async {
+    state = const AsyncValue.loading();
+    try {
+      // Gunakan transaction Firestore untuk memastikan atomicity
+      await _firestore.runTransaction((txn) async {
+        // 1. Dapatkan wallet terkait
+        final walletDoc = await txn.get(_firestore.collection('wallets').doc(transaction.walletId));
+        
+        if (!walletDoc.exists) {
+          throw Exception('Dompet tidak ditemukan');
+        }
+        
+        // 2. Update wallet balance (kembalikan ke kondisi sebelum transaksi)
+        WalletModel wallet = WalletModel.fromMap({'id': walletDoc.id, ...walletDoc.data()!});
+        double updatedBalance = wallet.balance;
+        
+        switch (transaction.type) {
+          case TransactionType.income:
+            updatedBalance -= transaction.amount; // Kurangi saldo karena income dibatalkan
+            break;
+          case TransactionType.expense:
+            updatedBalance += transaction.amount; // Tambah saldo karena expense dibatalkan
+            break;
+          case TransactionType.transfer:
+            if (transaction.destinationWalletId == null) {
+              throw Exception('ID dompet tujuan diperlukan untuk membatalkan transfer');
+            }
+            
+            updatedBalance += transaction.amount; // Kembalikan saldo ke wallet sumber
+            
+            // Dapatkan dompet tujuan untuk mengembalikan saldo
+            final destWalletDoc = await txn.get(_firestore.collection('wallets').doc(transaction.destinationWalletId));
+            if (!destWalletDoc.exists) {
+              throw Exception('Dompet tujuan tidak ditemukan');
+            }
+            
+            // Update saldo dompet tujuan
+            final destWallet = WalletModel.fromMap({'id': destWalletDoc.id, ...destWalletDoc.data()!});
+            final updatedDestBalance = destWallet.balance - transaction.amount; // Kurangi saldo di wallet tujuan
+            
+            // Pastikan tidak menjadi negatif
+            if (updatedDestBalance < 0) {
+              throw Exception('Tidak dapat membatalkan transfer: saldo dompet tujuan tidak mencukupi');
+            }
+            
+            txn.update(_firestore.collection('wallets').doc(transaction.destinationWalletId), {
+              'balance': updatedDestBalance,
+            });
+            
+            // Update status transaksi di dompet tujuan
+            final destTransactionQuery = await _firestore
+                .collection('wallets')
+                .doc(transaction.destinationWalletId)
+                .collection('transactions')
+                .where('destinationWalletId', isEqualTo: transaction.walletId)
+                .where('timestamp', isEqualTo: transaction.timestamp)
+                .get();
+            
+            if (destTransactionQuery.docs.isNotEmpty) {
+              txn.update(destTransactionQuery.docs.first.reference, {
+                'isActive': false,
+                'description': '[Dibatalkan] ${destTransactionQuery.docs.first.data()['description']}',
+              });
+            }
+            break;
+        }
+        
+        // 3. Update saldo wallet sumber
+        txn.update(_firestore.collection('wallets').doc(transaction.walletId), {
+          'balance': updatedBalance,
+        });
+        
+        // 4. Update status transaksi
+        final transactionRef = _firestore
+            .collection('wallets')
+            .doc(transaction.walletId)
+            .collection('transactions')
+            .doc(transaction.id);
+        
+        txn.update(transactionRef, {
+          'isActive': false,
+          'description': '[Dibatalkan] ${transaction.description}',
+        });
+      });
+      
+      state = const AsyncValue.data(null);
+    } catch (error, stackTrace) {
+      state = AsyncValue.error(error, stackTrace);
+      throw error;
+    }
+  }
+
+  /// Method untuk mengaktifkan kembali transaksi yang dibatalkan
+  Future<void> reactivateTransaction(TransactionModel transaction) async {
+    state = const AsyncValue.loading();
+    try {
+      // Gunakan transaction Firestore untuk memastikan atomicity
+      await _firestore.runTransaction((txn) async {
+        // 1. Dapatkan wallet terkait
+        final walletDoc = await txn.get(_firestore.collection('wallets').doc(transaction.walletId));
+        
+        if (!walletDoc.exists) {
+          throw Exception('Dompet tidak ditemukan');
+        }
+        
+        // 2. Update wallet balance (kembalikan ke kondisi setelah transaksi)
+        WalletModel wallet = WalletModel.fromMap({'id': walletDoc.id, ...walletDoc.data()!});
+        double updatedBalance = wallet.balance;
+        
+        switch (transaction.type) {
+          case TransactionType.income:
+            updatedBalance += transaction.amount; // Tambah saldo karena income diaktifkan
+            break;
+          case TransactionType.expense:
+            if (wallet.balance < transaction.amount) {
+              throw Exception('Saldo tidak cukup untuk mengaktifkan transaksi ini');
+            }
+            updatedBalance -= transaction.amount; // Kurangi saldo karena expense diaktifkan
+            break;
+          case TransactionType.transfer:
+            if (transaction.destinationWalletId == null) {
+              throw Exception('ID dompet tujuan diperlukan untuk mengaktifkan transfer');
+            }
+            
+            if (wallet.balance < transaction.amount) {
+              throw Exception('Saldo tidak cukup untuk mengaktifkan transfer ini');
+            }
+            updatedBalance -= transaction.amount;
+            
+            // Dapatkan dompet tujuan untuk menambah saldo
+            final destWalletDoc = await txn.get(_firestore.collection('wallets').doc(transaction.destinationWalletId));
+            if (!destWalletDoc.exists) {
+              throw Exception('Dompet tujuan tidak ditemukan');
+            }
+            
+            // Update saldo dompet tujuan
+            final destWallet = WalletModel.fromMap({'id': destWalletDoc.id, ...destWalletDoc.data()!});
+            final updatedDestBalance = destWallet.balance + transaction.amount;
+            
+            txn.update(_firestore.collection('wallets').doc(transaction.destinationWalletId), {
+              'balance': updatedDestBalance,
+            });
+            
+            // Update status transaksi di dompet tujuan
+            final destTransactionQuery = await _firestore
+                .collection('wallets')
+                .doc(transaction.destinationWalletId)
+                .collection('transactions')
+                .where('destinationWalletId', isEqualTo: transaction.walletId)
+                .where('timestamp', isEqualTo: transaction.timestamp)
+                .get();
+            
+            if (destTransactionQuery.docs.isNotEmpty) {
+              final destTransactionDoc = destTransactionQuery.docs.first;
+              final description = destTransactionDoc.data()['description'] as String;
+              
+              txn.update(destTransactionDoc.reference, {
+                'isActive': true,
+                'description': description.startsWith('[Dibatalkan] ') 
+                  ? description.substring('[Dibatalkan] '.length) 
+                  : description,
+              });
+            }
+            break;
+        }
+        
+        // 3. Update saldo wallet sumber
+        txn.update(_firestore.collection('wallets').doc(transaction.walletId), {
+          'balance': updatedBalance,
+        });
+        
+        // 4. Update status transaksi
+        final transactionRef = _firestore
+            .collection('wallets')
+            .doc(transaction.walletId)
+            .collection('transactions')
+            .doc(transaction.id);
+
+        txn.update(transactionRef, {
+          'isActive': true,
+          'description': transaction.description.startsWith('[Dibatalkan] ')
+            ? transaction.description.substring('[Dibatalkan] '.length)
+            : transaction.description,
+        });
+      });
+      
+      state = const AsyncValue.data(null);
+    } catch (error, stackTrace) {
+      state = AsyncValue.error(error, stackTrace);
       throw error;
     }
   }

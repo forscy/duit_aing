@@ -17,10 +17,10 @@ class AddTransactionPage extends ConsumerStatefulWidget {
   final TransactionType? initialType;
 
   const AddTransactionPage({
-    Key? key,
+    super.key,
     required this.walletId,
     this.initialType,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<AddTransactionPage> createState() => _AddTransactionPageState();

@@ -654,7 +654,7 @@ class WalletDetailPage extends ConsumerWidget {
                     separatorBuilder: (context, index) => const Divider(height: 1),
                     itemBuilder: (context, index) {
                       final transaction = transactions[index];
-                      return _buildTransactionItem(context, transaction);
+                      return _buildTransactionItem(context, ref, transaction);
                     },
                   ),
                 );
@@ -682,11 +682,11 @@ class WalletDetailPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildTransactionItem(BuildContext context, model.TransactionModel transaction) {
+  Widget _buildTransactionItem(BuildContext context, WidgetRef ref, model.TransactionModel transaction) {
     // Determine icon and color based on transaction type
-    IconData icon;
-    Color color;
-    String typeText;
+    IconData icon = Icons.circle; // Default value
+    Color color = Colors.grey; // Default value
+    String typeText = ''; // Default value
     
     switch (transaction.type) {
       case TransactionType.income:
@@ -710,19 +710,106 @@ class WalletDetailPage extends ConsumerWidget {
     final date = transaction.timestamp.toDate();
     final formattedDate = 
         '${date.day}/${date.month}/${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
-    
+
     return ListTile(
+      onLongPress: () async {
+        final result = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(transaction.isActive ? 'Batalkan Transaksi' : 'Aktifkan Transaksi'),
+              content: Text(
+                transaction.isActive 
+                  ? 'Anda yakin ingin membatalkan transaksi ini?\nTindakan ini akan mengubah saldo dompet.'
+                  : 'Anda yakin ingin mengaktifkan kembali transaksi ini?\nTindakan ini akan mengubah saldo dompet.'
+              ),
+              actions: [
+                TextButton(
+                  child: const Text('Tidak'),
+                  onPressed: () => context.pop(false),
+                ),
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: transaction.isActive ? Colors.red : Colors.green,
+                  ),
+                  child: Text(transaction.isActive ? 'Ya, Batalkan' : 'Ya, Aktifkan'),
+                  onPressed: () => context.pop(true),
+                ),
+              ],
+            );
+          },
+        );
+
+        if (result == true && context.mounted) {
+          try {
+            if (transaction.isActive) {
+              await ref.read(transactionNotifierProvider.notifier)
+                       .cancelTransaction(transaction);
+                       
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Transaksi berhasil dibatalkan')),
+                );
+              }
+            } else {
+              await ref.read(transactionNotifierProvider.notifier)
+                       .reactivateTransaction(transaction);
+                       
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Transaksi berhasil diaktifkan kembali')),
+                );
+              }
+            }
+          } catch (e) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Error: ${e.toString()}')),
+              );
+            }
+          }
+        }
+      },
       leading: CircleAvatar(
-        backgroundColor: color.withOpacity(0.2),
-        child: Icon(icon, color: color),
+        backgroundColor: transaction.isActive 
+            ? color.withOpacity(0.2)
+            : Colors.grey.withOpacity(0.2),
+        child: Icon(
+          icon, 
+          color: transaction.isActive ? color : Colors.grey,
+        ),
       ),
-      title: Text(transaction.description),
-      subtitle: Text('$typeText • $formattedDate'),
+      title: Text(
+        transaction.description,
+        style: !transaction.isActive 
+            ? const TextStyle(
+                decoration: TextDecoration.lineThrough,
+                color: Colors.grey,
+              )
+            : null,
+      ),
+      subtitle: Row(
+        children: [
+          Text('$typeText • $formattedDate'),
+          if (!transaction.isActive) ...[
+            const SizedBox(width: 4),
+            const Text(
+              '• Dibatalkan',
+              style: TextStyle(color: Colors.red),
+            ),
+          ],
+        ],
+      ),
       trailing: Text(
         CurrencyFormatter.format(transaction.amount),
         style: TextStyle(
-          color: transaction.type == TransactionType.expense ? Colors.red : 
-                 transaction.type == TransactionType.income ? Colors.green : Colors.blue,
+          color: !transaction.isActive 
+              ? Colors.grey
+              : transaction.type == TransactionType.expense 
+                  ? Colors.red 
+                  : transaction.type == TransactionType.income 
+                      ? Colors.green 
+                      : Colors.blue,
           fontWeight: FontWeight.bold,
         ),
       ),

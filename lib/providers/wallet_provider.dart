@@ -48,7 +48,7 @@ class WalletNotifier extends StateNotifier<AsyncValue<void>> {
       return wallet;
     } catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
-      throw error;
+      rethrow;
     }
   }
 
@@ -59,7 +59,7 @@ class WalletNotifier extends StateNotifier<AsyncValue<void>> {
       state = const AsyncValue.data(null);
     } catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
-      throw error;
+      rethrow;
     }
   }
 
@@ -70,7 +70,7 @@ class WalletNotifier extends StateNotifier<AsyncValue<void>> {
       state = const AsyncValue.data(null);
     } catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
-      throw error;
+      rethrow;
     }
   }
 
@@ -81,7 +81,7 @@ class WalletNotifier extends StateNotifier<AsyncValue<void>> {
       state = const AsyncValue.data(null);
     } catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
-      throw error;
+      rethrow;
     }
   }
 
@@ -93,7 +93,7 @@ class WalletNotifier extends StateNotifier<AsyncValue<void>> {
       state = const AsyncValue.data(null);
     } catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
-      throw error;
+      rethrow;
     }
   }
 }
